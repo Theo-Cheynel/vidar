@@ -159,6 +159,8 @@ def load_checkpoint(model, checkpoint, strict=False, verbose=False, prefix=None)
         for start in ['model.', 'module.']:
             if key.startswith(start):
                 key = key[len(start):]
+
+        key = 'arch.' + key
         if prefix is not None:
             idx = key.find(prefix)
             if idx > -1:
