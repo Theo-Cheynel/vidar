@@ -5,6 +5,8 @@ from collections import OrderedDict
 import torch
 from tqdm import tqdm
 
+from torchvision.utils import save_image
+
 from vidar.core.checkpoint import ModelCheckpoint
 from vidar.core.logger import WandbLogger
 from vidar.core.saver import Saver
@@ -396,6 +398,14 @@ class Trainer:
         # Loop through all batches
         for i, batch in progress_bar:
 
+            #import matplotlib.pyplot as plt
+            #plt.imshow(batch['rgb'][0][0].permute(1, 2, 0))
+            
+            #save_image(batch['rgb'][0][0], 'oe.png')
+
+            from pdb import set_trace as breakpoint
+            breakpoint()
+            
             # Send samples to GPU and take a training step
             batch = sample_to_cuda(batch, self.proc_rank)
             output = wrapper.training_step(batch, epoch=self.current_epoch)

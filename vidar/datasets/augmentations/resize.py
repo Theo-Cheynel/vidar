@@ -216,6 +216,7 @@ def resize_sample_input(sample, shape, shape_supervision=None,
     sample : Dict
         Resized sample
     """
+
     # Intrinsics
     for key in keys_with(sample, 'intrinsics', without='raw'):
         if f'raw_{key}' not in sample.keys():
