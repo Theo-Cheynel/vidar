@@ -4,6 +4,7 @@ import os
 import fire
 import torch
 from glob import glob
+from tqdm import tqdm
 
 from PIL import Image
 
@@ -102,7 +103,7 @@ def get_images_path_from_folder(folder, verbose=False):
     return files
 
 
-def infer_depth_map(cfg, checkpoint, input_path, output_path, **kwargs):
+def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **kwargs):
     """
     Runs an inference with the given config file or checkpoint.
     """
@@ -133,7 +134,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, **kwargs):
 
     # Process each file
     image_size_mode = None # 'resize' if needed to resize, 'ready' if ready to-run
-    for input_file in files:
+    for input_file in tqdm(files):
 
         # Load image
         image = Image.open(input_file) # load as PIL image
@@ -170,8 +171,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, **kwargs):
         depth_map = output['predictions']['depth'][0][0]
         depth_map /= depth_map.max()
 
-    # Saving images
-    for i, file in enumerate(files):
+        # Save depth map
         output_full_path = os.path.join(output_path, os.path.basename(file))
         save_image(depth_maps[i], output_full_path)
 
