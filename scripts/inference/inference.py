@@ -172,8 +172,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         depth_map /= depth_map.max()
 
         # Save depth map
-        output_full_path = os.path.join(output_path, os.path.basename(file))
-        save_image(depth_maps[i], output_full_path)
+        output_full_path = os.path.join(output_path, os.path.basename(input_file))
+        save_image(depth_map, output_full_path)
 
         if verbose:
             Log.info(f'Depth map inference done, saved depth map at {output_path}')
