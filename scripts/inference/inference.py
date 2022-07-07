@@ -60,7 +60,7 @@ def pad_to_upper_power_of_2(image):
     return pad_transform(image
             )
 
-def resize_image_to_tensor(image, base_size):
+def resize_image_to_tensor(image, base_size, verbose=False):
     """
     Resized image to a multiple of base_size
 
@@ -76,7 +76,9 @@ def resize_image_to_tensor(image, base_size):
     image_size = torch.Tensor([image.size[1], image.size[0]]).int()
     
     if (image_size - base_size <= 7).any(): # The image is smaller than the base_size, 7 is the biggest kernel size
-        Log.warning(f'Warning : Image of size {image_size} is smaller than base_size {base_size} and will be stretched to match it.')
+        if verbose:
+            Log.warning(f'Warning : Image of size {image_size} is smaller than base_size {base_size} and will be stretched to match it.')
+
         image = resize_pil(image, tuple(base_size.int().tolist()))
         return to_tensor_image(image)[:3] # Remove alpha channel if needed
 
@@ -148,10 +150,21 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, **kwargs):
 
                 # Resizing image to a size that's known to work
                 base_shape = torch.Tensor([192, 640])
-                image = resize_image_to_tensor(image, base_shape)
+                image = resize_image_to_tensor(image, base_shape, verbose)
 
                 # Then computing output
                 output = wrapper.run_arch({'rgb': image[(None,)*2]}, 0, False, False)
+        elif image_size_mode == 'resize':
+            # Resizing image to a size that's known to work
+            base_shape = torch.Tensor([192, 640])
+            image = resize_image_to_tensor(image, base_shape, verbose)
+
+            # Then computing output
+            output = wrapper.run_arch({'rgb': image[(None,)*2]}, 0, False, False)
+        else:
+            output = wrapper.run_arch({'rgb': to_tensor_image(image)[(None,)*2]}, 0, False, False)
+
+
 
         # Normalizing depth maps
         depth_map = output['predictions']['depth'][0][0]
