@@ -136,17 +136,22 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, **kwargs):
         # Load image
         image = Image.open(input_file) # load as PIL image
 
-        # Try with current image size
-        try:
-            output = wrapper.run_arch({'rgb': to_tensor_image(image)[(None,)*2]}, 0, False, False)
-        except:
-            Log.warning('Warning : image size is not compatible with the network. It will be resized to a compatible size (the closest possible to the original size)')
-            # Resizing image to a size that's known to work
-            base_shape = torch.Tensor([192, 640])
-            image = resize_image_to_tensor(image, base_shape)
+        if image_size_mode is None:
+            # Try with current image size
+            try:
+                output = wrapper.run_arch({'rgb': to_tensor_image(image)[(None,)*2]}, 0, False, False)
+            except:
+                image_size_mode = 'resize'
 
-            # Then computing output
-            output = wrapper.run_arch({'rgb': image[(None,)*2]}, 0, False, False)
+                if verbose:
+                    Log.warning('Warning : image size is not compatible with the network. It will be resized to a compatible size (the closest possible to the original size)')
+
+                # Resizing image to a size that's known to work
+                base_shape = torch.Tensor([192, 640])
+                image = resize_image_to_tensor(image, base_shape)
+
+                # Then computing output
+                output = wrapper.run_arch({'rgb': image[(None,)*2]}, 0, False, False)
 
         # Normalizing depth maps
         depth_map = output['predictions']['depth'][0][0]
