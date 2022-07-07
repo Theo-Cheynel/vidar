@@ -27,7 +27,7 @@ def video_to_images(vid_file, img_folder=None, verbose=False):
     command.append(f'{img_folder}/%06d.jpg')
 
     if verbose: print(f'Running \"{" ".join(command)}\"')
-    x = subprocess.run(command, capture_output=True)
+    x = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     handle_ffmpeg_errors(x, vid_file)
 
     if verbose: print(f'Images saved to \"{img_folder}\"')

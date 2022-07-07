@@ -3,6 +3,7 @@ import os
 
 import fire
 import torch
+from glob import glob
 
 from PIL import Image
 
@@ -89,7 +90,7 @@ def get_images_path_from_folder(folder, verbose=False):
 
     files = []
     for ext in ['png', 'jpg', 'jpeg']:
-        files.extend(glob((os.path.join(args.input, '*.{}'.format(ext)))))
+        files.extend(glob((os.path.join(folder, '*.{}'.format(ext)))))
     files.sort()
     
     if verbose:
