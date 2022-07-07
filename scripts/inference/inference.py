@@ -17,7 +17,7 @@ from vidar.datasets.augmentations.resize import resize_sample_input, resize_pil
 from vidar.datasets.augmentations.tensor import to_tensor_sample, to_tensor_image
 from vidar.utils.config import read_config
 
-from .utils import video_utils
+from scripts.inference.utils import video_utils
 
 from pdb import set_trace as breakpoint
 
