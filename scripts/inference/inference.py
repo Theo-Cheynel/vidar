@@ -72,7 +72,8 @@ def resize_image_to_tensor(image, base_size):
         torch.Tensor : resized image as a tensor
     """
 
-    image_size = torch.Tensor([image.size[1], image.size[0]])
+    base_size = base_size.int()
+    image_size = torch.Tensor([image.size[1], image.size[0]]).int()
     
     if (image_size - base_size <= 7).any(): # The image is smaller than the base_size, 7 is the biggest kernel size
         Log.warning(f'Warning : Image of size {image_size} is smaller than base_size {base_size} and will be stretched to match it.')
@@ -129,6 +130,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, **kwargs):
             files = [input_path]
 
     # Process each file
+    image_size_mode = None # 'resize' if needed to resize, 'ready' if ready to-run
     for input_file in files:
 
         # Load image
