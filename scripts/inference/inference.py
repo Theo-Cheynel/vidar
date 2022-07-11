@@ -1,27 +1,24 @@
 # TRI-VIDAR - Copyright 2022 Toyota Research Institute.  All rights reserved.
 import os
+from glob import glob
+from pdb import set_trace as breakpoint
+from shutil import rmtree
 
 import fire
 import torch
-from glob import glob
-from tqdm import tqdm
-
+import torchvision.transforms as T
 from PIL import Image
-
+from scripts.inference.utils import video_utils
 from torchvision.io import read_image
 from torchvision.utils import save_image
-
-import torchvision.transforms as T
-from shutil import rmtree
-
+from tqdm import tqdm
 from vidar.core.wrapper import Wrapper
-from vidar.datasets.augmentations.resize import resize_sample_input, resize_pil
-from vidar.datasets.augmentations.tensor import to_tensor_sample, to_tensor_image
+from vidar.datasets.augmentations.resize import resize_pil, resize_sample_input
+from vidar.datasets.augmentations.tensor import (to_tensor, to_tensor_image,
+                                                 to_tensor_sample)
 from vidar.utils.config import read_config
+from vidar.utils.types import is_seq
 
-from scripts.inference.utils import video_utils
-
-from pdb import set_trace as breakpoint
 
 class Log:
     HEADER = '\033[95m'
@@ -61,31 +58,37 @@ def pad_to_upper_power_of_2(image):
     return pad_transform(image
             )
 
-def resize_image_to_tensor(image, base_size, verbose=False):
+def resize_images_to_tensor(images, base_size, verbose=False):
     """
     Resized image to a multiple of base_size
 
     Args:
-        image : PIL image
+        images : list of PIL images
         base_size (torch.Tensor)
 
     Returns:
-        torch.Tensor : resized image as a tensor
+        torch.Tensor : images, of shape (batch_size, 3, H, W)
     """
+    if len(images) == 0:
+        return []
 
     base_size = base_size.int()
-    image_size = torch.Tensor([image.size[1], image.size[0]]).int()
+    image_size = torch.Tensor([images[0].size[1], images[0].size[0]]).int()
     
     if (image_size - base_size <= 7).any(): # The image is smaller than the base_size, 7 is the biggest kernel size
         if verbose:
             Log.warning(f'Warning : Image of size {image_size} is smaller than base_size {base_size} and will be stretched to match it.')
 
-        image = resize_pil(image, tuple(base_size.int().tolist()))
-        return to_tensor_image(image)[:3] # Remove alpha channel if needed
+        images = resize_pil(images, tuple(base_size.int().tolist()))
+        
+        #return to_tensor_image(image)[:3] # Remove alpha channel if needed
+        return torch.stack([i[:3] for i in images])
 
-    else: # The image is larger than the base_size
-        image = to_tensor_image(image)
-        return image[:, :image_size[0]//base_size[0] * base_size[0], :image_size[1]//base_size[1] * base_size[1]][:3] # Remove alpha channel
+    else: # The image is larger than the base_size : adapt its ratio to match the greater multiple of the base size, independantly for each dimension (it works)
+        images = to_tensor_image(images)
+
+        #return image[:, :image_size[0]//base_size[0] * base_size[0], :image_size[1]//base_size[1] * base_size[1]][:3] # Remove alpha channel
+        return torch.stack([i[:, :image_size[0]//base_size[0] * base_size[0], :image_size[1]//base_size[1] * base_size[1]][:3] for i in images])
 
 
 def get_images_path_from_folder(folder, verbose=False):
@@ -103,9 +106,79 @@ def get_images_path_from_folder(folder, verbose=False):
     return files
 
 
+def infer_batch_with_resize_test(images, wrapper, verbose=False):
+    """
+    Returns the type of resizing mode associated with the given batch
+
+    Args:
+        images: list of PIL images to infer from or list of images path
+        wrapper: paper's wrapper object
+    
+    Returns:
+        string: 'resize' of images need to be resized, None otherwise.
+        torch.Tensor : batch inference of the given images.
+    """
+
+    image_resize_mode = None
+    try:
+        inference = infer_batch(images, wrapper, image_resize_mode=None, verbose=verbose)
+        image_resize_mode = 'resize'
+    except:
+        inference = infer_batch(images, wrapper, image_resize_mode='resize', verbose=verbose)
+
+    return image_resize_mode, inference
+
+
+def infer_batch(images, wrapper, image_resize_mode, verbose=False):
+    """
+    Performs an inference on a batch.
+    Warning : this method DO NOT perform a memory check, images must fit in available memory, and the given device.
+    TODO : Add possibility to normalize result ! (To avoid saturation when saved as an image)
+
+    Args:
+        images: list of PIL images to infer from or list of images path
+        wrapper : Paper's wrapper object
+        image_resize_mode : Either None if nothing needs to be done, or 'resize' to match network requirements.
+        verbose : verbose
+
+    Returns:
+        torch.Tensor : depth maps of shape (batch_size, ...)
+    """
+
+    if len(images) == 0:
+        return
+
+    # Path are passed
+    if isinstance(images[0], str):
+        images = [Image.open(path) for path in images]
+
+    if image_resize_mode is None:
+        predictions = wrapper.run_arch({'rgb': torch.stack(to_tensor_image(images))}, 0, False, False)
+    elif image_resize_mode == 'resize':
+        base_size = torch.Tensor([192, 640])
+        batch_tensor = resize_images_to_tensor(images, base_size, verbose)
+        predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
+
+    # Close images
+    for img in images:
+        img.close()
+        
+    return predictions
+
+
 def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **kwargs):
     """
     Runs an inference with the given config file or checkpoint.
+
+    Args:
+        cfg : Config object
+        checkpoint : Network checkpoint to infer with
+        input_path : either an image or a video path
+        output_path : a folder to save the infered depth maps to
+        verbose : verbose
+
+    Returns:
+        None, the depth maps will be written in output_path
     """
 
     os.environ['DIST_MODE'] = 'gpu' if torch.cuda.is_available() else 'cpu'
@@ -132,48 +205,36 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             # Otherwise, use it as is
             files = [input_path]
 
-    # Process each file
-    image_size_mode = None # 'resize' if needed to resize, 'ready' if ready to-run
-    for input_file in tqdm(files):
+    batch_size = 5
+    # Test the resize method with the first batch
+    image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
+    for i, depth_map in enumerate(prediction['predictions']['depth'][0]):
+        depth_map /= depth_map.max()
+        save_image(depth_map, files[i])
+        del depth_map # Avoid memory leaks
 
-        # Load image
-        image = Image.open(input_file) # load as PIL image
+    # Process each remaining batch
+    batch_filepaths = [files[i:i+batch_size] for i in range(0, len(files), batch_size)]
+    for filepaths in tqdm(batch_filepaths):
 
-        if image_size_mode is None:
-            # Try with current image size
-            try:
-                output = wrapper.run_arch({'rgb': to_tensor_image(image)[(None,)*2]}, 0, False, False)
-            except:
-                image_size_mode = 'resize'
+        # Load images
+        images = [Image.open(f) for f in filepaths] # load as PIL image
 
-                if verbose:
-                    Log.warning('Warning : image size is not compatible with the network. It will be resized to a compatible size (the closest possible to the original size)')
-
-                # Resizing image to a size that's known to work
-                base_shape = torch.Tensor([192, 640])
-                image = resize_image_to_tensor(image, base_shape, verbose)
-
-                # Then computing output
-                output = wrapper.run_arch({'rgb': image[(None,)*2]}, 0, False, False)
-        elif image_size_mode == 'resize':
-            # Resizing image to a size that's known to work
-            base_shape = torch.Tensor([192, 640])
-            image = resize_image_to_tensor(image, base_shape, verbose)
-
-            # Then computing output
-            output = wrapper.run_arch({'rgb': image[(None,)*2]}, 0, False, False)
-        else:
-            output = wrapper.run_arch({'rgb': to_tensor_image(image)[(None,)*2]}, 0, False, False)
-
-
+        # Inference 
+        predictions = infer_batch(images, wrapper, image_resize_mode, verbose)
 
         # Normalizing depth maps
-        depth_map = output['predictions']['depth'][0][0]
-        depth_map /= depth_map.max()
+        depth_maps = predictions['predictions']['depth'][0]
+        depth_maps /= depth_map.max()
 
-        # Save depth map
-        output_full_path = os.path.join(output_path, os.path.basename(input_file))
-        save_image(depth_map, output_full_path)
+        # Saving depth maps
+        output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
+        for i, depth_map in enumerate(depth_maps):
+            save_image(depth_map, output_full_paths[i])
+        
+        # Closing images
+        for img in images:
+            img.close()
 
         if verbose:
             Log.info(f'Depth map inference done, saved depth map at {output_path}')
@@ -181,8 +242,6 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     # Deleting temp folder if needed
     if extracted_images_folder is not None:
         rmtree(extracted_images_folder)
-
-
 
 
 if __name__ == '__main__':
