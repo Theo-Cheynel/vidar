@@ -154,7 +154,7 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
         images = [Image.open(path) for path in images]
 
     if image_resize_mode is None:
-        print([img.size for img in images])
+        print('infer_batch', [img.size for img in images])
         predictions = wrapper.run_arch({'rgb': torch.stack(to_tensor_image(images))}, 0, False, False)
     elif image_resize_mode == 'resize':
         base_size = torch.Tensor([192, 640])
@@ -191,8 +191,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     wrapper.load(checkpoint, verbose=False)
     wrapper.eval_custom()
     
-    if dist_mode():
-        wrapper.cuda()
+    if dist_mode() == 'gpu':
+        wrapper.cuda() # Puts the model on GPU. TODO : Directly load it on the GPU instead of loading it in CPU then pushing it in VRAM.
 
     #wrapper.evaluate(batch, output)
 
@@ -205,6 +205,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         extracted_images_folder = None
         if file_extension.lower()[1:] in ['mp4', 'mov', 'wmv', 'avi', 'mkv']:
             extracted_images_folder = video_utils.video_to_images(input_path)
+            breakpoint()
             files = get_images_path_from_folder(extracted_images_folder)
         else:
             # Otherwise, use it as is
