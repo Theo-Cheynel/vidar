@@ -205,6 +205,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         extracted_images_folder = None
         if file_extension.lower()[1:] in ['mp4', 'mov', 'wmv', 'avi', 'mkv']:
             extracted_images_folder = video_utils.video_to_images(input_path)
+            print("Extracted images in", extracted_images_folder)
             breakpoint()
             files = get_images_path_from_folder(extracted_images_folder)
         else:
