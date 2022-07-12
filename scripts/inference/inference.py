@@ -153,21 +153,22 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     if isinstance(images[0], str):
         images = [Image.open(path) for path in images]
 
-    print([img.size for img in images])
-
     if image_resize_mode is None:
-        predictions = wrapper.run_arch({'rgb': torch.stack(to_tensor_image(images)).unsqueeze(0)}, 0, False, False)
+        batch_tensor = to_tensor_image(images)
+        predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
+        del batch_tensor
     elif image_resize_mode == 'resize':
         base_size = torch.Tensor([192, 640])
         batch_tensor = resize_images_to_tensor(images, base_size, verbose).unsqueeze(0)
         predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
+        del batch_tensor
 
     # Close images
     for img in images:
         img.close()
 
     del images
-    print("Closed and deleted images")
+    print("Closed and deleted images & tensors")
         
     return predictions
 
