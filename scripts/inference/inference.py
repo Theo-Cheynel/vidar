@@ -230,7 +230,6 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
 
         # Inference 
         predictions = infer_batch(images, wrapper, image_resize_mode, verbose)
-        breakpoint()
 
         # Normalizing depth maps
         depth_maps = predictions['predictions']['depth'][0]
