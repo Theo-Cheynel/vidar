@@ -99,6 +99,7 @@ class ResNetEncoder(nn.Module, ABC):
         """Network forward pass"""
 
         x = (input_image - 0.45) / 0.225
+        print("ResNetEncoder", x.device)
         x = self.encoder.conv1(x)
         x = self.encoder.bn1(x)
 
