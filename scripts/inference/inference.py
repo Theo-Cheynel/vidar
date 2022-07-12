@@ -240,7 +240,6 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         for i, depth_map in enumerate(depth_maps):
             save_image(depth_map, output_full_paths[i])
             del depth_map
-            del predictions
         
         # Closing images
         for img in images:
