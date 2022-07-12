@@ -227,23 +227,32 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
 
         # Loading images here to close them in the same loop
         images = [Image.open(f) for f in filepaths]
+        breakpoint()
 
         # Inference 
         predictions = infer_batch(images, wrapper, image_resize_mode, verbose)
+        breakpoint()
+
 
         # Normalizing depth maps
         depth_maps = predictions['predictions']['depth'][0]
         depth_maps = [map / map.max() for map in depth_maps]
+        breakpoint()
+
 
         # Saving depth maps
         output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
         for i, depth_map in enumerate(depth_maps):
             save_image(depth_map, output_full_paths[i])
-            del depth_map
+        
+        del depth_maps
+        breakpoint()
         
         # Closing images
         for img in images:
             img.close()
+
+        breakpoint()
 
         if verbose:
             Log.info(f'Depth map inference done, saved depth map at {output_path}')
