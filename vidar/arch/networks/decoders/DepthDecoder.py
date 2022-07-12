@@ -75,7 +75,7 @@ class DepthDecoder(nn.Module, ABC):
                 x += [input_features[i - 1]]
                 print('BEFORE PADDING', x[0].shape, x[-1].shape)
                 if x[-1].shape != x[0].shape:
-                    x[-1] = pad(x[-1], (0, (x[-1].shape[3] - x[-1].shape[3])//2, 0, (x[-1].shape[2] - x[0].shape[2])//2, 0, 0, 0, 0))
+                    x[-1] = pad(x[-1], (0, (x[-1].shape[3] - x[0].shape[3])//2, 0, (x[-1].shape[2] - x[0].shape[2])//2, 0, 0, 0, 0))
                 print('AFTER PADDING', x[0].shape, x[-1].shape)
             x = torch.cat(x, 1)
             x = self.convs[('upconv', i, 1)](x)
