@@ -18,6 +18,7 @@ from vidar.datasets.augmentations.tensor import (to_tensor, to_tensor_image,
                                                  to_tensor_sample)
 from vidar.utils.config import read_config
 from vidar.utils.types import is_seq
+from vidar.utils.distributed import dist_mode
 
 
 class Log:
@@ -188,6 +189,9 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     wrapper = Wrapper(cfg, verbose=False)
     wrapper.load(checkpoint, verbose=False)
     wrapper.eval_custom()
+    
+    if dist_mode()
+        wrapper.cuda()
 
     #wrapper.evaluate(batch, output)
 
