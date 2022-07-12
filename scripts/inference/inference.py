@@ -154,7 +154,7 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
         images = [Image.open(path) for path in images]
 
     if image_resize_mode is None:
-        print([img.size for img in images])
+        
         predictions = wrapper.run_arch({'rgb': torch.stack(to_tensor_image(images))}, 0, False, False)
     elif image_resize_mode == 'resize':
         base_size = torch.Tensor([192, 640])
