@@ -154,7 +154,6 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
         images = [Image.open(path) for path in images]
 
     if image_resize_mode is None:
-        print('infer_batch', [img.size for img in images])
         predictions = wrapper.run_arch({'rgb': torch.stack(to_tensor_image(images))}, 0, False, False)
     elif image_resize_mode == 'resize':
         base_size = torch.Tensor([192, 640])
@@ -213,6 +212,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     batch_size = 5
     # Test the resize method with the first batch
     image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
+
+    print("Tested first batch, image_resize_mode is", image_resize_mode)
     for i, depth_map in enumerate(prediction['predictions']['depth'][0]):
         depth_map /= depth_map.max()
         save_image(depth_map, files[i])
@@ -224,7 +225,6 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
 
         # Load images
         images = [Image.open(f) for f in filepaths] # load as PIL image
-        print([img.size for img in images])
 
         # Inference 
         predictions = infer_batch(images, wrapper, image_resize_mode, verbose)
