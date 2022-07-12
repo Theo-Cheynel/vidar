@@ -223,11 +223,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     batch_filepaths = [files[i:i+batch_size] for i in range(0, len(files), batch_size)]
     for filepaths in tqdm(batch_filepaths):
 
-        # Load images
-        images = [Image.open(f) for f in filepaths] # load as PIL image
-
         # Inference 
-        predictions = infer_batch(images, wrapper, image_resize_mode, verbose)
+        predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
 
         # Normalizing depth maps
         depth_maps = predictions['predictions']['depth'][0]
