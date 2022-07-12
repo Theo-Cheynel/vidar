@@ -30,8 +30,10 @@ class Wrapper(torch.nn.Module, ABC):
     verbose : Bool
         Print information on screen if enabled
     """
-    def __init__(self, cfg, ckpt=None, verbose=False):
+    def __init__(self, cfg, ckpt=None, verbose=False, device=torch.device('cpu')):
         super().__init__()
+
+        self.device = device
 
         if verbose and rank() == 0:
             font = {'color': 'cyan', 'attrs': ('bold', 'dark')}
