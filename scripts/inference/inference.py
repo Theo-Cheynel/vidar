@@ -190,7 +190,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     wrapper.load(checkpoint, verbose=False)
     wrapper.eval_custom()
     
-    if dist_mode()
+    if dist_mode():
         wrapper.cuda()
 
     #wrapper.evaluate(batch, output)
