@@ -211,7 +211,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             # Otherwise, use it as is
             files = [input_path]
 
-    batch_size = 5
+    batch_size = 1
     # Test the resize method with the first batch
     image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
 
