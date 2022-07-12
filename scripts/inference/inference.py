@@ -225,12 +225,15 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
     for filepaths in tqdm(batch_filepaths):
 
+        # Loading images here to close them in the same loop
+        images = [Image.open(f) for f in filepaths]
+
         # Inference 
-        predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
+        predictions = infer_batch(images, wrapper, image_resize_mode, verbose)
 
         # Normalizing depth maps
         depth_maps = predictions['predictions']['depth'][0]
-        depth_maps /= depth_map.max()
+        depth_maps /= depth_maps.max()
 
         # Saving depth maps
         output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
@@ -238,8 +241,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             save_image(depth_map, output_full_paths[i])
         
         # Closing images
-        # for img in images:
-        #     img.close()
+        for img in images:
+            img.close()
 
         if verbose:
             Log.info(f'Depth map inference done, saved depth map at {output_path}')
