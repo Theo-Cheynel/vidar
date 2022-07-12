@@ -233,7 +233,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
 
         # Normalizing depth maps
         depth_maps = predictions['predictions']['depth'][0]
-        depth_maps /= depth_maps.max()
+        breakpoint()
+        depth_maps = [depth_maps.max()]
 
         # Saving depth maps
         output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
