@@ -6,6 +6,7 @@ from collections import OrderedDict
 import numpy as np
 import torch
 import torch.nn as nn
+from torch.nn.functional import pad
 
 from vidar.arch.networks.layers.convs import ConvBlock, Conv3x3, upsample
 from vidar.utils.config import cfg_has
@@ -72,7 +73,10 @@ class DepthDecoder(nn.Module, ABC):
             if self.use_skips and i > 0:
                 
                 x += [input_features[i - 1]]
-                print(x[-1].shape, x[0].shape)
+                print('BEFORE PADDING', x[0].shape, x[-1].shape)
+                if x[-1].shape != x[0].shape:
+                    x[-1] = pad(x[-1], [(0, max(x[0].shape[3], x[-1].shape[3])//2), (0, max(x[0].shape[2], x[-1].shape[2])//2), (0, 0), (0, 0)])
+                print('AFTER PADDING', x[0].shape, x[-1].shape)
             x = torch.cat(x, 1)
             x = self.convs[('upconv', i, 1)](x)
             if i in range(self.num_scales):
