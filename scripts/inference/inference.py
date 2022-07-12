@@ -167,6 +167,7 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
         img.close()
 
     del images
+    print("Closed and deleted images")
         
     return predictions
 
@@ -249,6 +250,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         
         del depth_maps
 
+        print("Deleted depth maps")
         breakpoint()
 
         if verbose:
