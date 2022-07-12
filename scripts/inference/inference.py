@@ -165,6 +165,8 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     # Close images
     for img in images:
         img.close()
+
+    del images
         
     return predictions
 
@@ -229,12 +231,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
     for filepaths in tqdm(batch_filepaths):
 
-        # Loading images here to close them in the same loop
-        images = [Image.open(f) for f in filepaths]
-        breakpoint()
-
         # Inference 
-        predictions = infer_batch(images, wrapper, image_resize_mode, verbose)
+        predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
         breakpoint()
 
 
@@ -250,11 +248,6 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             save_image(depth_map, output_full_paths[i])
         
         del depth_maps
-        breakpoint()
-        
-        # Closing images
-        for img in images:
-            img.close()
 
         breakpoint()
 
