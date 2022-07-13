@@ -1,7 +1,8 @@
 # TRI-VIDAR - Copyright 2022 Toyota Research Institute.  All rights reserved.
 import os
+import gc
 from glob import glob
-from pdb import set_trace as breakpoint
+from pdb import set_trace as breakpoint_pdb
 from shutil import rmtree
 
 import fire
@@ -20,6 +21,15 @@ from vidar.utils.config import read_config
 from vidar.utils.types import is_seq
 from vidar.utils.distributed import dist_mode
 
+def breakpoint():
+    for obj in gc.get_objects():
+        try:
+            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+                print(type(obj), obj.size())
+        except:
+            pass
+
+    breakpoint_pdb()
 
 class Log:
     HEADER = '\033[95m'
@@ -123,9 +133,9 @@ def infer_batch_with_resize_test(images, wrapper, verbose=False):
     image_resize_mode = None
     try:
         inference = infer_batch(images, wrapper, image_resize_mode=None, verbose=verbose)
-        image_resize_mode = 'resize'
     except:
         inference = infer_batch(images, wrapper, image_resize_mode='resize', verbose=verbose)
+        image_resize_mode = 'resize'
 
     return image_resize_mode, inference
 
@@ -149,18 +159,18 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     if len(images) == 0:
         return
 
-    # Path are passed
+    # Images path are passed instead of images directly : loading them
     if isinstance(images[0], str):
         images = [Image.open(path) for path in images]
 
     if image_resize_mode is None:
         batch_tensor = to_tensor_image(images)
-        wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
+        predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
         del batch_tensor
     elif image_resize_mode == 'resize':
         base_size = torch.Tensor([192, 640])
         batch_tensor = resize_images_to_tensor(images, base_size, verbose).unsqueeze(0)
-        wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
+        predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
         del batch_tensor
 
     # Close images
