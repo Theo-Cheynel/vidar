@@ -158,7 +158,7 @@ class Wrapper(torch.nn.Module, ABC):
         Returns
         -------
         output : Dict
-            Dictionary with model outputs
+            Dictionary with modelrun_arch outputs
         """
         batch = flip_batch(batch) if flip else batch
         output = self.arch(batch, epoch=epoch)
@@ -202,7 +202,7 @@ class Wrapper(torch.nn.Module, ABC):
             batch = output['batch']
 
         results = self.evaluate(batch, output, flipped_output)
-
+run_arch
         results = [{
             'idx': batch['idx'][i],
             **{key: val[i] for key, val in results['metrics'].items()}

@@ -21,13 +21,14 @@ from vidar.utils.config import read_config
 from vidar.utils.types import is_seq
 from vidar.utils.distributed import dist_mode
 
-def breakpoint():
-    for obj in gc.get_objects():
-        try:
-            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
-                print(type(obj), obj.size())
-        except:
-            pass
+def breakpoint(list_objects=False):
+    if list_objects:
+        for obj in gc.get_objects():
+            try:
+                if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+                    print(type(obj), obj.size())
+            except:
+                pass
 
     breakpoint_pdb()
 
@@ -166,12 +167,10 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     if image_resize_mode is None:
         batch_tensor = to_tensor_image(images)
         predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
-        del batch_tensor
     elif image_resize_mode == 'resize':
         base_size = torch.Tensor([192, 640])
         batch_tensor = resize_images_to_tensor(images, base_size, verbose).unsqueeze(0)
         predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
-        del batch_tensor
 
     # Close images
     for img in images:
