@@ -225,8 +225,6 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             # Otherwise, use it as is
             files = [input_path]
 
-    breakpoint()
-
     batch_size = 5
     # Test the resize method with the first batch
     image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
@@ -236,36 +234,40 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         depth_map /= depth_map.max()
         save_image(depth_map, files[i])
         del depth_map # Avoid memory leaks
-    
-    breakpoint()
 
     # Process each remaining batch
-    batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
-    for filepaths in tqdm(batch_filepaths):
+    with torch.profiler.profile(
+        schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/profiler'),
+        record_shapes=True,
+        profile_memory=True,
+        with_stack=True
+    ) as prof:
+        batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
+        for filepaths in tqdm(batch_filepaths):
 
-        # Inference 
-        predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
-        breakpoint()
+            # Inference 
+            predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
 
 
-        # Normalizing depth maps
-        depth_maps = predictions['predictions']['depth'][0]
-        depth_maps = [map / map.max() for map in depth_maps]
-        breakpoint()
+            # Normalizing depth maps
+            depth_maps = predictions['predictions']['depth'][0]
+            depth_maps = [map / map.max() for map in depth_maps]
 
 
-        # Saving depth maps
-        output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
-        for i, depth_map in enumerate(depth_maps):
-            save_image(depth_map, output_full_paths[i])
-        
-        del depth_maps
+            # Saving depth maps
+            output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
+            for i, depth_map in enumerate(depth_maps):
+                save_image(depth_map, output_full_paths[i])
+            
+            del depth_maps
 
-        print("Deleted depth maps")
-        breakpoint()
+            print("Deleted depth maps")
 
-        if verbose:
-            Log.info(f'Depth map inference done, saved depth map at {output_path}')
+            if verbose:
+                Log.info(f'Depth map inference done, saved depth map at {output_path}')
+            
+            prof.step()
 
     # Deleting temp folder if needed
     if extracted_images_folder is not None:
