@@ -141,7 +141,7 @@ def infer_batch_with_resize_test(images, wrapper, verbose=False):
     return image_resize_mode, inference
 
 
-def infer_batch(images, wrapper, image_resize_mode, verbose=False, dummy=False):
+def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     """
     Performs an inference on a batch.
     Warning : this method DO NOT perform a memory check, images must fit in available memory, and the given device.
@@ -164,17 +164,15 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False, dummy=False):
     if isinstance(images[0], str):
         images = [Image.open(path) for path in images]
 
-    if not dummy:
-        if image_resize_mode is None:
-            batch_tensor = to_tensor_image(images)
-            predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
-        elif image_resize_mode == 'resize':
-            base_size = torch.Tensor([192, 640])
-            batch_tensor = resize_images_to_tensor(images, base_size, verbose).unsqueeze(0)
-            predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
+    if image_resize_mode is None:
+        batch_tensor = to_tensor_image(images)
+        # predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
+    elif image_resize_mode == 'resize':
+        base_size = torch.Tensor([192, 640])
+        batch_tensor = resize_images_to_tensor(images, base_size, verbose).unsqueeze(0)
+        # predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
 
-    else:
-        predictions = None
+    predictions = None
 
     # Close images
     for img in images:
