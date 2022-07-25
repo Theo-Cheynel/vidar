@@ -181,7 +181,7 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False, dummy=False):
         img.close()
 
     del images
-    print("Closed and deleted images & tensors")
+    #print("Closed and deleted images & tensors")
     #breakpoint()
         
     return predictions
