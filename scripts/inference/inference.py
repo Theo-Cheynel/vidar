@@ -230,14 +230,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             files = [input_path]
 
     batch_size = 5
-    # Test the resize method with the first batch
-    image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
-
-    print("Tested first batch, image_resize_mode is", image_resize_mode)
-    for i, depth_map in enumerate(prediction['predictions']['depth'][0]):
-        depth_map /= depth_map.max()
-        save_image(depth_map, files[i])
-        del depth_map # Avoid memory leaks
+    
 
     # Process each remaining batch
     with torch.profiler.profile(
@@ -247,6 +240,16 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         profile_memory=True,
         with_stack=True
     ) as prof:
+    
+        # Test the resize method with the first batch
+        image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
+
+        print("Tested first batch, image_resize_mode is", image_resize_mode)
+        for i, depth_map in enumerate(prediction['predictions']['depth'][0]):
+            depth_map /= depth_map.max()
+            save_image(depth_map, files[i])
+            del depth_map # Avoid memory leaks
+
         batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
         for filepaths in tqdm(batch_filepaths):
 
