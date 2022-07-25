@@ -55,7 +55,6 @@ class Wrapper(torch.nn.Module, ABC):
         self.arch = setup_arch(cfg.arch, checkpoint=ckpt, verbose=verbose) if cfg_has(cfg, 'arch') else None
         self.datasets, self.datasets_cfg = setup_datasets(
             cfg.datasets, verbose=verbose) if cfg_has(cfg, 'datasets') else (None, None)
-        print("-> DATASET OBJ", self.datasets)
         self.metrics = setup_metrics(cfg.evaluation) if cfg_has(cfg, 'evaluation') else {}
 
         sync_batch_norm = cfg_has(cfg.wrapper, 'sync_batch_norm', False)
