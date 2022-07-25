@@ -250,7 +250,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             save_image(depth_map, files[i])
             del depth_map # Avoid memory leaks
 
-        print(f'{image_resize_mode=}')
+        print('image_resize_mode=', image_resize_mode)
         prof.step()
 
         batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
