@@ -1,7 +1,8 @@
 # TRI-VIDAR - Copyright 2022 Toyota Research Institute.  All rights reserved.
 import os
+import gc
 from glob import glob
-from pdb import set_trace as breakpoint
+from pdb import set_trace as breakpoint_pdb
 from shutil import rmtree
 
 import fire
@@ -20,6 +21,16 @@ from vidar.utils.config import read_config
 from vidar.utils.types import is_seq
 from vidar.utils.distributed import dist_mode
 
+def breakpoint(list_objects=False):
+    if list_objects:
+        for obj in gc.get_objects():
+            try:
+                if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+                    print(type(obj), obj.size())
+            except:
+                pass
+
+    breakpoint_pdb()
 
 class Log:
     HEADER = '\033[95m'
@@ -123,9 +134,9 @@ def infer_batch_with_resize_test(images, wrapper, verbose=False):
     image_resize_mode = None
     try:
         inference = infer_batch(images, wrapper, image_resize_mode=None, verbose=verbose)
-        image_resize_mode = 'resize'
     except:
         inference = infer_batch(images, wrapper, image_resize_mode='resize', verbose=verbose)
+        image_resize_mode = 'resize'
 
     return image_resize_mode, inference
 
@@ -149,19 +160,17 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     if len(images) == 0:
         return
 
-    # Path are passed
+    # Images path are passed instead of images directly : loading them
     if isinstance(images[0], str):
         images = [Image.open(path) for path in images]
 
     if image_resize_mode is None:
         batch_tensor = to_tensor_image(images)
-        wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
-        del batch_tensor
+        predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
     elif image_resize_mode == 'resize':
         base_size = torch.Tensor([192, 640])
         batch_tensor = resize_images_to_tensor(images, base_size, verbose).unsqueeze(0)
-        wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
-        del batch_tensor
+        predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
 
     # Close images
     for img in images:
@@ -169,7 +178,7 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
 
     del images
     print("Closed and deleted images & tensors")
-    breakpoint()
+    #breakpoint()
         
     return predictions
 
@@ -216,8 +225,6 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             # Otherwise, use it as is
             files = [input_path]
 
-    breakpoint()
-
     batch_size = 5
     # Test the resize method with the first batch
     image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
@@ -227,36 +234,41 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         depth_map /= depth_map.max()
         save_image(depth_map, files[i])
         del depth_map # Avoid memory leaks
-    
-    breakpoint()
 
     # Process each remaining batch
-    batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
-    for filepaths in tqdm(batch_filepaths):
+    with torch.profiler.profile(
+        schedule=torch.profiler.schedule(wait=0, warmup=0, active=3, repeat=2),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('/data/log/profiler'),
+        record_shapes=True,
+        profile_memory=True,
+        with_stack=True
+    ) as prof:
+        batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
+        for filepaths in tqdm(batch_filepaths):
 
-        # Inference 
-        predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
-        breakpoint()
+            # Inference 
+            predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
+            print("#### Inference done")
 
+            # Normalizing depth maps
+            depth_maps = predictions['predictions']['depth'][0]
+            depth_maps = [map / map.max() for map in depth_maps]
+            print("#### Normalization done")
 
-        # Normalizing depth maps
-        depth_maps = predictions['predictions']['depth'][0]
-        depth_maps = [map / map.max() for map in depth_maps]
-        breakpoint()
+            # Saving depth maps
+            output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
+            for i, depth_map in enumerate(depth_maps):
+                save_image(depth_map, output_full_paths[i])
+            
+            del depth_maps
 
+            print("#### Deleted depth maps")
 
-        # Saving depth maps
-        output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
-        for i, depth_map in enumerate(depth_maps):
-            save_image(depth_map, output_full_paths[i])
-        
-        del depth_maps
-
-        print("Deleted depth maps")
-        breakpoint()
-
-        if verbose:
-            Log.info(f'Depth map inference done, saved depth map at {output_path}')
+            if verbose:
+                Log.info(f'Depth map inference done, saved depth map at {output_path}')
+            
+            prof.step()
+            print("#### Batch done")
 
     # Deleting temp folder if needed
     if extracted_images_folder is not None:
