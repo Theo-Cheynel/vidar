@@ -257,7 +257,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         for filepaths in tqdm(batch_filepaths):
 
             # Inference 
-            predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose, dummy=True)
+            predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
             #print("#### Inference done")
             
 
