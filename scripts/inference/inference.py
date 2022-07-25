@@ -260,7 +260,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
             print(len(predictions['predictions']['depth']))
             depth_maps = predictions['predictions']['depth'][0]
-            nbr_predictions = depth_maps // 4
+            nbr_predictions = len(depth_maps) // 4 # For each predictions are the original 
             depth_maps = depth_maps[torch.arange(start=0, end=nbr_predictions*4, steps=4)]
             #print("#### Inference done")
         
