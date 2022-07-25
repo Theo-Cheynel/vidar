@@ -264,13 +264,14 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
 
             # Normalizing depth maps
             depth_maps = predictions['predictions']['depth'][0]
+            breakpoint()
             # depth_maps = [map / map.max() for map in depth_maps]
             # print("#### Normalization done")
 
             # Saving depth maps
             output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
             for i, depth_map in enumerate(depth_maps):
-                save_image(depth_map, output_full_paths[i])
+                save_image(depth_map / depth_map.max(), output_full_paths[i]) # Saving with normalization
             
             # del depth_maps
 
