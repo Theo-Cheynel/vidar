@@ -238,7 +238,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     # Process each remaining batch
     with torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
-        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/profiler'),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./data/log/profiler'),
         record_shapes=True,
         profile_memory=True,
         with_stack=True
@@ -248,12 +248,12 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
 
             # Inference 
             predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
-
+            print("#### Inference done")
 
             # Normalizing depth maps
             depth_maps = predictions['predictions']['depth'][0]
             depth_maps = [map / map.max() for map in depth_maps]
-
+            print("#### Normalization done")
 
             # Saving depth maps
             output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
@@ -262,12 +262,13 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             
             del depth_maps
 
-            print("Deleted depth maps")
+            print("#### Deleted depth maps")
 
             if verbose:
                 Log.info(f'Depth map inference done, saved depth map at {output_path}')
             
             prof.step()
+            print("#### Batch done")
 
     # Deleting temp folder if needed
     if extracted_images_folder is not None:
