@@ -238,7 +238,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
     # Process each remaining batch
     with torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
-        on_trace_ready=torch.profiler.tensorboard_trace_handler('./data/log/profiler'),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('/data/log/profiler'),
         record_shapes=True,
         profile_memory=True,
         with_stack=True
