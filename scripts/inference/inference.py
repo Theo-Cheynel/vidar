@@ -250,26 +250,26 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             # Inference 
             predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
             print("#### Inference done")
-            prof.step()
+            
 
             # Normalizing depth maps
-            depth_maps = predictions['predictions']['depth'][0]
-            depth_maps = [map / map.max() for map in depth_maps]
-            print("#### Normalization done")
+            # depth_maps = predictions['predictions']['depth'][0]
+            # depth_maps = [map / map.max() for map in depth_maps]
+            # print("#### Normalization done")
 
-            # Saving depth maps
-            output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
-            for i, depth_map in enumerate(depth_maps):
-                save_image(depth_map, output_full_paths[i])
+            # # Saving depth maps
+            # output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
+            # for i, depth_map in enumerate(depth_maps):
+            #     save_image(depth_map, output_full_paths[i])
             
-            del depth_maps
+            # del depth_maps
 
-            print("#### Deleted depth maps")
+            # print("#### Deleted depth maps")
 
-            if verbose:
-                Log.info(f'Depth map inference done, saved depth map at {output_path}')
+            # if verbose:
+            #     Log.info(f'Depth map inference done, saved depth map at {output_path}')
             
-            
+            prof.step()
             print("#### Batch done")
 
     # Deleting temp folder if needed
