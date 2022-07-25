@@ -164,14 +164,15 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     if isinstance(images[0], str):
         images = [Image.open(path) for path in images]
 
-    # if image_resize_mode is None:
-    #     batch_tensor = to_tensor_image(images)
-    #     predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
-    # elif image_resize_mode == 'resize':
-    #     base_size = torch.Tensor([192, 640])
-    #     batch_tensor = resize_images_to_tensor(images, base_size, verbose).unsqueeze(0)
-    #     predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
+    if image_resize_mode is None:
+        batch_tensor = to_tensor_image(images)
+        # predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
+    elif image_resize_mode == 'resize':
+        base_size = torch.Tensor([192, 640])
+        batch_tensor = resize_images_to_tensor(images, base_size, verbose).unsqueeze(0)
+        # predictions = wrapper.run_arch({'rgb': batch_tensor}, 0, False, False)
 
+    predictions = None
     # Close images
     for img in images:
         img.close()
@@ -249,6 +250,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             # Inference 
             predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
             print("#### Inference done")
+            prof.step()
 
             # Normalizing depth maps
             depth_maps = predictions['predictions']['depth'][0]
@@ -267,7 +269,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             if verbose:
                 Log.info(f'Depth map inference done, saved depth map at {output_path}')
             
-            prof.step()
+            
             print("#### Batch done")
 
     # Deleting temp folder if needed
