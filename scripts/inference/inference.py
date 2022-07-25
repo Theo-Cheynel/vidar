@@ -261,16 +261,16 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
             print(len(predictions['predictions']['depth']))
             depth_maps = predictions['predictions']['depth'][0]
-            nbr_predictions = len(depth_maps) // 4 # For each predictions are the original 
-            depth_maps = depth_maps[np.arange(start=0, stop=nbr_predictions*4, step=4)]
+            nbr_predictions = len(depth_maps) // 4 # For each predictions are the original, and 3 additionnal downscaled samples.
             #print("#### Inference done")
         
             # Saving depth maps
             output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
-            for i, depth_map in enumerate(depth_maps):
+            for i in np.arange(stop=len(depth_maps), step=4):
                 # TODO : Batchify the normalization
-                print('depth_map.shape=', depth_map.shape)
-                save_image(depth_map / depth_map.max(), output_full_paths[i]) # Saving with normalization
+                print('depth_maps[i].shape=', depth_maps[i].shape)
+                for in_batch_index in range(batch_size):
+                    save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index]) # Saving with normalization
             
             # del depth_maps
 
