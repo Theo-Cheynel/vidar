@@ -7,6 +7,7 @@ from shutil import rmtree
 
 import fire
 import torch
+import numpy as np
 import torchvision.transforms as T
 from PIL import Image
 from scripts.inference.utils import video_utils
@@ -261,7 +262,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             print(len(predictions['predictions']['depth']))
             depth_maps = predictions['predictions']['depth'][0]
             nbr_predictions = len(depth_maps) // 4 # For each predictions are the original 
-            depth_maps = depth_maps[torch.arange(start=0, end=nbr_predictions*4, steps=4)]
+            depth_maps = depth_maps[np.arange(start=0, stop=nbr_predictions*4, step=4)]
             #print("#### Inference done")
         
             # Saving depth maps
