@@ -158,16 +158,15 @@ class Wrapper(torch.nn.Module, ABC):
         Returns
         -------
         output : Dict
-            Dictionary with modelrun_arch outputs
+            Dictionary with model outputs
         """
     
         batch = flip_batch(batch) if flip else batch
-        print("ARCH", self.arch)
         output = self.arch(batch, epoch=epoch)
         return flip_output(output) if flip and unflip else output
 
     def training_step(self, batch, epoch):
-        """Processes a training batch"""
+        """Processes a traprint(list(predictions.keys()))ining batch"""
         flip_lr = False if self.flip_lr_prob == 0 else \
             random.random() < self.flip_lr_prob
 
