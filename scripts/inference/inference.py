@@ -269,7 +269,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             for i in np.arange(start=0, stop=len(depth_maps), step=4):
                 # TODO : Batchify the normalization
                 print('depth_maps[i].shape=', depth_maps[i].shape)
-                for in_batch_index in range(batch_size):
+                for in_batch_index in range(depth_maps[i].shape[0]): # Not using batch_size but the shape here for the last element that can have a dim < batch_size
+                    print(in_batch_index, depth_maps[i].shape[0])
                     save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index]) # Saving with normalization
             
             # del depth_maps
