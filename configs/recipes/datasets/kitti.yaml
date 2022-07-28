@@ -7,7 +7,7 @@ train_selfsup_mr:
         resize: [192, 640]
     dataloader:
         batch_size: 1
-        pin_memory: True
+        pin_memory: False
         num_workers: 4
     context: [-1,1]
     labels: []
@@ -22,7 +22,7 @@ validation_mr:
         resize: [192, 640]
     dataloader:
         batch_size: 1
-        pin_memory: True
+        pin_memory: False
         num_workers: 4
     context: []
     labels: [depth]
