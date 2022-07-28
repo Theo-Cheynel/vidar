@@ -403,8 +403,8 @@ class Trainer:
             
             #save_image(batch['rgb'][0][0], 'oe.png')
 
-            from pdb import set_trace as breakpoint
-            breakpoint()
+            # from pdb import set_trace as breakpoint
+            # breakpoint()
             
             # Send samples to GPU and take a training step
             batch = sample_to_cuda(batch, self.proc_rank)
