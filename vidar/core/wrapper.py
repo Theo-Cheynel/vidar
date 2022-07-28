@@ -163,7 +163,6 @@ class Wrapper(torch.nn.Module, ABC):
     
         batch = flip_batch(batch) if flip else batch
         output = self.arch(batch, epoch=epoch)
-        print(list(output.keys()))
         return flip_output(output) if flip and unflip else output
 
     def training_step(self, batch, epoch):

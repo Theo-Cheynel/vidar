@@ -57,6 +57,7 @@ class SelfSupervisedModel(BaseModel, ABC):
 
         predictions = {
             'depth': {0: pred_depth},
+            'intrinsics': intrinsics
         }
 
         pred_logvar = get_from_dict(depth_output, 'logvar')
