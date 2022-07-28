@@ -250,6 +250,8 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
 
         # print('image_resize_mode=', image_resize_mode)
 
+        image_resize_mode = None
+
         batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
         for filepaths in tqdm(batch_filepaths):
 
