@@ -41,6 +41,7 @@ class SelfSupervisedModel(BaseModel, ABC):
     def forward(self, batch, epoch=0):
         """Model forward pass"""
 
+        print("IT'S ME ! FORWARD !")
         rgb = batch['rgb']
         if self.use_gt_intrinsics:
             intrinsics = get_from_dict(batch, 'intrinsics')
