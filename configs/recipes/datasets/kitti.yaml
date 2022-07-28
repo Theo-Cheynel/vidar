@@ -8,7 +8,7 @@ train_selfsup_mr:
     dataloader:
         batch_size: 1
         pin_memory: True
-        num_workers: 16
+        num_workers: 4
     context: [-1,1]
     labels: []
     cameras: [[0]]
@@ -23,7 +23,7 @@ validation_mr:
     dataloader:
         batch_size: 1
         pin_memory: True
-        num_workers: 16
+        num_workers: 4
     context: []
     labels: [depth]
     cameras: [[0]]
