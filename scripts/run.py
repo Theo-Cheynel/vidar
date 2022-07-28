@@ -12,7 +12,9 @@ from vidar.utils.config import read_config
 
 def train(cfg, **kwargs):
 
+    print("#### Setting multiprocessing start method to spawn.")
     torch.multiprocessing.set_start_method('spawn')
+
     os.environ['DIST_MODE'] = 'gpu' if torch.cuda.is_available() else 'cpu'
 
     cfg = read_config(cfg, **kwargs)
