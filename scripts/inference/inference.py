@@ -228,7 +228,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             # Otherwise, use it as is
             files = [input_path]
 
-    batch_size = 5
+    batch_size = 10
     
 
     # Process each remaining batch
@@ -261,21 +261,15 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
             print(len(predictions['predictions']['depth']))
             depth_maps = predictions['predictions']['depth'][0]
-            nbr_predictions = len(depth_maps) // 4 # For each predictions are the original, and 3 additionnal downscaled samples.
             #print("#### Inference done")
         
             # Saving depth maps
             output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
             for i in np.arange(start=0, stop=len(depth_maps), step=4):
                 # TODO : Batchify the normalization
-                print('depth_maps[i].shape=', depth_maps[i].shape)
                 for in_batch_index in range(depth_maps[i].shape[0]): # Not using batch_size but the shape here for the last element that can have a dim < batch_size
-                    print(in_batch_index, depth_maps[i].shape[0])
                     save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index]) # Saving with normalization
             
-            # del depth_maps
-
-            # print("#### Deleted depth maps")
 
             if verbose:
                 Log.info(f'Depth map inference done, saved depth map at {output_path}')
