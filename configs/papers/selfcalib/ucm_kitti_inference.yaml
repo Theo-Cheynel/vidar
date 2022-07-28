@@ -23,7 +23,3 @@ arch:
 evaluation:
     depth:
         recipe: evaluation/depth|kitti_resize
-    intrinsics:
-        file: intrinsics/IntrinsicsNet
-        camera_model: 'UCM'
-        shape: [192, 640]

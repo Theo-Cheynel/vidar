@@ -160,6 +160,7 @@ class Wrapper(torch.nn.Module, ABC):
         output : Dict
             Dictionary with modelrun_arch outputs
         """
+    
         batch = flip_batch(batch) if flip else batch
         output = self.arch(batch, epoch=epoch)
         return flip_output(output) if flip and unflip else output
