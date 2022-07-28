@@ -258,7 +258,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
 
             # Inference 
             predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
-            print(predictions['intrinsics'])
+            print(predictions['predictions']['intrinsics'])
             depth_maps = predictions['predictions']['depth'][0]
             #print("#### Inference done")
         
