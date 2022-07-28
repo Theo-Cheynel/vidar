@@ -186,7 +186,7 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     return predictions
 
 
-def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **kwargs):
+def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False, verbose=False, **kwargs):
     """
     Runs an inference with the given config file or checkpoint.
 
@@ -195,6 +195,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         checkpoint : Network checkpoint to infer with
         input_path : either an image or a video path
         output_path : a folder to save the infered depth maps to
+        resize_check (bool): will try one batch without resizing, and resize afterwards if it failed.
         verbose : verbose
 
     Returns:
@@ -228,6 +229,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
             # Otherwise, use it as is
             files = [input_path]
 
+
     batch_size = 5
     
 
@@ -240,20 +242,22 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, verbose=False, **k
         with_stack=True
     ) as prof:
 
-        # # Test the resize method with the first batch
-        # image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
+        if resize_check:
+            # Test the resize method with the first batch
+            image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
 
-        # print("Tested first batch, image_resize_mode is", image_resize_mode)
-        # for i, depth_map in enumerate(prediction['predictions']['depth'][0]):
-        #     depth_map /= depth_map.max()
-        #     save_image(depth_map, files[i])
+            print("Tested first batch, image_resize_mode is", image_resize_mode)
+            for i, depth_map in enumerate(prediction['predictions']['depth'][0]):
+                depth_map /= depth_map.max()
+                save_image(depth_map, files[i])
 
-        # print('image_resize_mode =', image_resize_mode)
+            print('image_resize_mode =', image_resize_mode)
 
         # Temporary
         image_resize_mode = None
 
-        batch_filepaths = [files[i:i+batch_size] for i in range(batch_size, len(files), batch_size)]
+        start = 0 if not resize_check else batch_size
+        batch_filepaths = [files[i:i+batch_size] for i in range(start, len(files), batch_size)]
         for filepaths in tqdm(batch_filepaths):
 
             # Inference 
