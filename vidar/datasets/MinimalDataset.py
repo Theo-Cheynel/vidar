@@ -32,8 +32,11 @@ class MinimalDataset(BaseDataset):
 
         self.split = split.split('/')[-1].split('.')[0]
 
+        # Things I don't what are they used for
         self._cache = {}
         self.sequence_origin_cache = {}
+        self.backward_context_paths = []
+        self.forward_context_paths = []
 
         # Get files from the txt file
         with open(os.path.join(self.path, split), "r") as f:
