@@ -34,6 +34,7 @@ class MinimalDataset(BaseDataset):
 
         # Things I don't what are they used for
         self._cache = {}
+        self.calibration_cache = {}
         self.sequence_origin_cache = {}
         self.backward_context_paths = []
         self.forward_context_paths = []
