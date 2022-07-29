@@ -1,5 +1,5 @@
 train_selfsup_mr:
-    name: [Minimal]
+    name: [Minimal] # Need to be the correct name ! The MinimalDataset class is retrieved from it.
     path: [/data/vidar/MinimalDataset]
     split: [minimal_dataset.txt]
     augmentation:
