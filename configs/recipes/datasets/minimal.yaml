@@ -1,5 +1,5 @@
 train_selfsup_mr:
-    name: [MINIMAL]
+    name: [Minimal]
     path: [/data/vidar/MinimalDataset]
     split: [minimal_dataset.txt]
     augmentation:
