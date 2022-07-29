@@ -43,7 +43,7 @@ class BaseDataset(Dataset, ABC):
         self.path = path
         self.labels = labels
         self.labels_context = labels_context
-        self.cameras = cameras
+        self.cameras = cameras # Camera names
         self.data_transform = data_transform
 
         self.num_cameras = len(cameras) if is_list(cameras) else cameras
