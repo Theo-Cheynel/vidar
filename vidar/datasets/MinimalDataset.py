@@ -1,5 +1,5 @@
 # TRI-VIDAR - Copyright 2022 Toyota Research Institute.  All rights reserved.
-
+import glob
 import os
 
 import numpy as np
@@ -65,6 +65,89 @@ class MinimalDataset(BaseDataset):
     def _get_parent_folder(image_file):
         """Get the parent folder from image_file"""
         return os.path.abspath(os.path.join(image_file, "../../"))
+
+    def _get_sample_context(self, sample_name,
+                            backward_context, forward_context, stride=1):
+        """
+        Get a sample context
+
+        Parameters
+        ----------
+        sample_name : String
+            Path + Name of the sample
+        backward_context : Int
+            Size of backward context
+        forward_context : Int
+            Size of forward context
+        stride : Int
+            Stride value to consider when building the context
+
+        Returns
+        -------
+        backward_context : list[Int]
+            List containing the indexes for the backward context
+        forward_context : list[Int]
+            List containing the indexes for the forward context
+        """
+        base, ext = os.path.splitext(os.path.basename(sample_name))
+        parent_folder = os.path.dirname(sample_name)
+        f_idx = int(base)
+
+        # Check number of files in folder
+        if parent_folder in self._cache:
+            max_num_files = self._cache[parent_folder]
+        else:
+            max_num_files = len(glob.glob(os.path.join(parent_folder, '*' + ext)))
+            self._cache[parent_folder] = max_num_files
+
+        # Check bounds
+        if (f_idx - backward_context * stride) < 0 or (
+                f_idx + forward_context * stride) >= max_num_files:
+            return None, None
+
+        # Backward context
+        c_idx = f_idx
+        backward_context_idxs = []
+        while len(backward_context_idxs) < backward_context and c_idx > 0:
+            c_idx -= stride
+            filename = self._get_next_file(c_idx, sample_name)
+            if os.path.exists(filename):
+                backward_context_idxs.append(c_idx)
+        if c_idx < 0:
+            return None, None
+
+        # Forward context
+        c_idx = f_idx
+        forward_context_idxs = []
+        while len(forward_context_idxs) < forward_context and c_idx < max_num_files:
+            c_idx += stride
+            filename = self._get_next_file(c_idx, sample_name)
+            if os.path.exists(filename):
+                forward_context_idxs.append(c_idx)
+        if c_idx >= max_num_files:
+            return None, None
+
+        return backward_context_idxs, forward_context_idxs
+
+    def _get_context_files(self, sample_name, idxs):
+        """
+        Returns image context files
+
+        Parameters
+        ----------
+        sample_name : String
+            Name of current sample
+        idxs : list[Int]
+            Context indexes
+
+        Returns
+        -------
+        image_context_paths : list[String]
+            List of image names for the context
+        None : depth files if they were supported
+        """
+        image_context_paths = [self._get_next_file(i, sample_name) for i in idxs]
+        return image_context_paths, None
 
 ########################################################################################################################
 
