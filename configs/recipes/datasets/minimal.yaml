@@ -14,4 +14,3 @@ train_selfsup_mr:
     cameras: [[0]]
     single_intrinsics: [True]
     repeat: [100]
-    depth_type: [velodyne]

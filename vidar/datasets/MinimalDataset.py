@@ -181,12 +181,12 @@ class MinimalDataset(BaseDataset):
             sample['rgb'] = {0: read_image(filename)}
 
             # Intrinsics
-            parent_folder = self._get_parent_folder(filename)
-            if parent_folder in self.calibration_cache:
-                c_data = self.calibration_cache[parent_folder]
-            else:
-                c_data = self._read_raw_calib_file(parent_folder)
-                self.calibration_cache[parent_folder] = c_data
+            # parent_folder = self._get_parent_folder(filename)
+            # if parent_folder in self.calibration_cache:
+            #     c_data = self.calibration_cache[parent_folder]
+            # else:
+            #     c_data = self._read_raw_calib_file(parent_folder)
+            #     self.calibration_cache[parent_folder] = c_data
 
             # Return individual or single intrinsics
             if self.single_intrinsics is not None:
