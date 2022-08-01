@@ -197,10 +197,8 @@ class OverfitDataset(BaseDataset):
             # Return individual or single intrinsics
             if self.single_intrinsics is not None:
                 intrinsics = self.single_intrinsics.copy()
-                print("Single intrinsics", self.single_intrinsics)
                 intrinsics[0, :] *= sample['rgb'][0].size[0]
                 intrinsics[1, :] *= sample['rgb'][0].size[1]
-                print(intrinsics, intrinsics.shape)
                 sample['intrinsics'] = {0: intrinsics}
             else:
                 raise NotImplementedError("Minimal example only works with single intrinsics for now.")
