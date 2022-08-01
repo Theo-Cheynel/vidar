@@ -30,14 +30,14 @@ class OverfitDataset(BaseDataset):
         #                                     [0.00, 0.00, 1.0, 0],
         #                                     [0.00, 0.00, 0.0, 1]], dtype=np.float32)
 
-        self.single_intrinsics = np.array([ [583, 0.00, 320, 0],
-                                            [0.00, 579, 240, 0],
-                                            [0.00, 0.00, 1.0, 0],
-                                            [0.00, 0.00, 0.0, 1]], dtype=np.float32)                                            
+        self.single_intrinsics = np.array([ [0.5625, 0.00, 0.5, 0],
+                                            [0.00,   1,    0.5, 0],
+                                            [0.00,   0.00, 1.0, 0],
+                                            [0.00,   0.00, 0.0, 1]], dtype=np.float32)                                            
 
         self.split = split.split('/')[-1].split('.')[0]
 
-        # Things I don't what are they used for
+        # Things I don't know what are they used for
         self._cache = {}
         self.calibration_cache = {}
         self.sequence_origin_cache = {}
@@ -185,14 +185,6 @@ class OverfitDataset(BaseDataset):
             # Image
             sample['rgb'] = {0: read_image(filename)}
 
-            # Intrinsics
-            # parent_folder = self._get_parent_folder(filename)
-            # if parent_folder in self.calibration_cache:
-            #     c_data = self.calibration_cache[parent_folder]
-            # else:
-            #     c_data = self._read_raw_calib_file(parent_folder)
-            #     self.calibration_cache[parent_folder] = c_data
-
             # Return individual or single intrinsics
             if self.single_intrinsics is not None:
                 intrinsics = self.single_intrinsics.copy()
@@ -208,7 +200,7 @@ class OverfitDataset(BaseDataset):
                 # Add context images
                 all_context_idxs = self.backward_context_paths[idx] + \
                                    self.forward_context_paths[idx]
-                image_context_paths, depth_context_paths = \
+                image_context_paths, _ = \
                     self._get_context_files(filename, all_context_idxs)
                 image_context = [read_image(f) for f in image_context_paths]
                 sample['rgb'].update({
