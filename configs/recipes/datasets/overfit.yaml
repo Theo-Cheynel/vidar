@@ -12,7 +12,7 @@ train_selfsup_mr:
     labels: []
     cameras: [[0]]
     single_intrinsics: [True]
-    repeat: [100]
+    repeat: [1]
 validation_mr:
     name: [Overfit]
     path: [/data/vidar/OverfitDataset]
