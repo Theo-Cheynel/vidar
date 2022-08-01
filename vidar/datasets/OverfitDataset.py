@@ -25,10 +25,15 @@ class OverfitDataset(BaseDataset):
         super().__init__(**kwargs)
         self.tag = 'minimal'
 
-        self.single_intrinsics = np.array([ [0.58, 0.00, 0.5, 0],
-                                            [0.00, 1.92, 0.5, 0],
+        # self.single_intrinsics = np.array([ [0.58, 0.00, 0.5, 0],
+        #                                     [0.00, 1.92, 0.5, 0],
+        #                                     [0.00, 0.00, 1.0, 0],
+        #                                     [0.00, 0.00, 0.0, 1]], dtype=np.float32)
+
+        self.single_intrinsics = np.array([ [583, 0.00, 320, 0],
+                                            [0.00, 579, 240, 0],
                                             [0.00, 0.00, 1.0, 0],
-                                            [0.00, 0.00, 0.0, 1]], dtype=np.float32)
+                                            [0.00, 0.00, 0.0, 1]], dtype=np.float32)                                            
 
         self.split = split.split('/')[-1].split('.')[0]
 
