@@ -38,6 +38,11 @@ datasets:
         recipe: datasets/overfit|train_selfsup_mr
         dataloader:
             batch_size: 1
+    validation:
+        recipe: datasets/overfit|validation_mr
+        dataloader:
+            batch_size: 1
+
 wandb:
     folder: /data/vidar/wandb     # Where the wandb run is stored
     entity: Kinetix           # Wandb entity

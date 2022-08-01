@@ -14,7 +14,7 @@ train_selfsup_mr:
     single_intrinsics: [True]
     repeat: [1]
 validation_mr:
-    name: [KITTI]
+    name: [Overfit]
     path: [/data/vidar/OverfitDataset]
     split: [overfit_val_dataset.txt]
     augmentation:
