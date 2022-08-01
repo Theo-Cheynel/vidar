@@ -14,7 +14,7 @@ arch:
         intrinsics:
             file: intrinsics/IntrinsicsNet
             camera_model: 'UCM'
-            shape: [192, 640]
+            shape: [640, 480]
     losses:
         reprojection:
             recipe: losses/reprojection|default
@@ -37,4 +37,4 @@ datasets:
     train:
         recipe: datasets/overfit|train_selfsup_mr
         dataloader:
-            batch_size: 8
+            batch_size: 1
