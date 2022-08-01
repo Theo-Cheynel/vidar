@@ -23,7 +23,7 @@ class OverfitDataset(BaseDataset):
     """
     def __init__(self, split, **kwargs):
         super().__init__(**kwargs)
-        self.tag = 'minimal'
+        self.tag = 'overfit'
 
         # self.single_intrinsics = np.array([ [0.58, 0.00, 0.5, 0],
         #                                     [0.00, 1.92, 0.5, 0],
@@ -190,6 +190,7 @@ class OverfitDataset(BaseDataset):
                 intrinsics = self.single_intrinsics.copy()
                 intrinsics[0, :] *= sample['rgb'][0].size[0]
                 intrinsics[1, :] *= sample['rgb'][0].size[1]
+                breakpoint()
                 sample['intrinsics'] = {0: intrinsics}
             else:
                 raise NotImplementedError("Minimal example only works with single intrinsics for now.")
