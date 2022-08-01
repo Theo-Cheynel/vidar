@@ -3,7 +3,7 @@ train_selfsup_mr:
     path: [/data/vidar/OverfitDataset]
     split: [overfit_dataset_mini.txt]
     augmentation:
-        resize: [640,480]
+        resize: [480,640]
     dataloader:
         batch_size: 1
         pin_memory: False
@@ -18,7 +18,7 @@ validation_mr:
     path: [/data/vidar/OverfitDataset]
     split: [overfit_val_dataset.txt]
     augmentation:
-        resize: [640,480]
+        resize: [480,640]
     dataloader:
         batch_size: 1
         pin_memory: False
