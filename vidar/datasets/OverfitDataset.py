@@ -4,6 +4,8 @@ import os
 
 import numpy as np
 
+from pdb import set_trace as breakpoint
+
 from vidar.datasets.BaseDataset import BaseDataset
 from vidar.datasets.utils.misc import stack_sample, make_relative_pose
 from vidar.utils.read import read_image
