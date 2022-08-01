@@ -14,7 +14,7 @@ arch:
         intrinsics:
             file: intrinsics/IntrinsicsNet
             camera_model: 'UCM'
-            shape: [640, 480]
+            shape: [480, 640]
     losses:
         reprojection:
             recipe: losses/reprojection|default
