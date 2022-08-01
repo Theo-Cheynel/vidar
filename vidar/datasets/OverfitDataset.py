@@ -32,10 +32,17 @@ class OverfitDataset(BaseDataset):
         #                                     [0.00, 0.00, 1.0, 0],
         #                                     [0.00, 0.00, 0.0, 1]], dtype=np.float32)
 
-        self.single_intrinsics = np.array([ [0.5625, 0.00, 0.5, 0],
+        # self.single_intrinsics = np.array([ [0.5625, 0.00, 0.5, 0],
+        #                                     [0.00,   1,    0.5, 0],
+        #                                     [0.00,   0.00, 1.0, 0],
+        #                                     [0.00,   0.00, 0.0, 1]], dtype=np.float32)
+
+
+        self.single_intrinsics = np.array([ [1,      0.00, 0.5, 0],
                                             [0.00,   1,    0.5, 0],
                                             [0.00,   0.00, 1.0, 0],
-                                            [0.00,   0.00, 0.0, 1]], dtype=np.float32)                                            
+                                            [0.00,   0.00, 0.0, 1]], dtype=np.float32)
+                                                
 
         self.split = split.split('/')[-1].split('.')[0]
 
