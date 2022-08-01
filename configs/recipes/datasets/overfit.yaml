@@ -1,0 +1,16 @@
+train_selfsup_mr:
+    name: [Overfit] # Need to be the correct name ! The MinimalDataset class is retrieved from it.
+    path: [/data/vidar/OverfitDataset]
+    split: [overfit_dataset.txt]
+    augmentation:
+        jittering: [0.2,0.2,0.2,0.05]
+        resize: [640,480]
+    dataloader:
+        batch_size: 1
+        pin_memory: False
+        num_workers: 4
+    context: [-1,1]
+    labels: []
+    cameras: [[0]]
+    single_intrinsics: [True]
+    repeat: [100]
