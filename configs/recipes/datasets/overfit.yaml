@@ -13,3 +13,17 @@ train_selfsup_mr:
     cameras: [[0]]
     single_intrinsics: [True]
     repeat: [1]
+validation_mr:
+    name: [KITTI]
+    path: [/data/vidar/OverfitDataset]
+    split: [overfit_val_dataset.txt]
+    augmentation:
+        resize: [640,480]
+    dataloader:
+        batch_size: 1
+        pin_memory: False
+        num_workers: 4
+    context: []
+    labels: []
+    cameras: [[0]]
+    single_intrinsics: [True]    
