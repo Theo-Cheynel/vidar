@@ -42,3 +42,4 @@ wandb:
     folder: /data/vidar/wandb     # Where the wandb run is stored
     entity: Kinetix           # Wandb entity
     project: selfcalib         # Wandb project
+    num_validation_logs: 3
