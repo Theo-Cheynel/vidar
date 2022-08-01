@@ -35,10 +35,15 @@ optimizers:
         lr: 0.01
 datasets:
     train:
-        recipe: datasets/kitti|train_selfsup_mr
+        recipe: datasets/kitti_tiny|train_selfsup_mr
         dataloader:
             batch_size: 8
     validation:
-        recipe: datasets/kitti|validation_mr
+        recipe: datasets/kitti_tiny|validation_mr
         dataloader:
             batch_size: 1
+wandb:
+    folder: /data/vidar/wandb     # Where the wandb run is stored
+    entity: Kinetix           # Wandb entity
+    project: selfcalib         # Wandb project
+    num_validation_logs: 3
