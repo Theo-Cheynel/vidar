@@ -1,7 +1,7 @@
 train_selfsup_mr:
     name: [Overfit] # Need to be the correct name ! The MinimalDataset class is retrieved from it.
     path: [/data/vidar/OverfitDataset]
-    split: [overfit_dataset.txt]
+    split: [overfit_dataset_mini.txt]
     augmentation:
         resize: [640,480]
     dataloader:
