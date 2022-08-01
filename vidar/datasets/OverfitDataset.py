@@ -192,7 +192,7 @@ class OverfitDataset(BaseDataset):
                 intrinsics = self.single_intrinsics.copy()
                 intrinsics[0, :] *= sample['rgb'][0].size[0]
                 intrinsics[1, :] *= sample['rgb'][0].size[1]
-                breakpoint()
+                print(intrinsics, intrinsics.shape)
                 sample['intrinsics'] = {0: intrinsics}
             else:
                 raise NotImplementedError("Minimal example only works with single intrinsics for now.")
