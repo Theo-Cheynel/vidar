@@ -12,7 +12,7 @@ train_selfsup_mr:
     labels: []
     cameras: [[0]]
     single_intrinsics: [True]
-    repeat: [10]
+    repeat: [5]
     depth_type: [velodyne]
 validation_mr:
     name: [Thomas]

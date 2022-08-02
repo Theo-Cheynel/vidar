@@ -37,11 +37,11 @@ datasets:
     train:
         recipe: datasets/thomas|train_selfsup_mr
         dataloader:
-            batch_size: 5
+            batch_size: 10
     validation:
         recipe: datasets/thomas|validation_mr
         dataloader:
-            batch_size: 5
+            batch_size: 16
 
 wandb:
     folder: /data/vidar/wandb     # Where the wandb run is stored
