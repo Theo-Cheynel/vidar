@@ -13,6 +13,7 @@ train_selfsup_mr:
     cameras: [[0]]
     single_intrinsics: [True]
     repeat: [1]
+    depth_type: [velodyne]
 validation_mr:
     name: [Overfit]
     path: [/data/vidar/OverfitDataset]
