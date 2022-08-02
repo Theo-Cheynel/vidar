@@ -250,7 +250,6 @@ class Wrapper(torch.nn.Module, ABC):
         # Evaluate different tasks
         metrics, predictions = OrderedDict(), OrderedDict()
         for task in self.metrics:
-            print(type(task))
             task_metrics, task_predictions = \
                 self.metrics[task].evaluate(batch, output['predictions'],
                     flipped_output['predictions'] if flipped_output else None)
