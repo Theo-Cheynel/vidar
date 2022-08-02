@@ -2,8 +2,8 @@ train_selfsup_mr:
     name: [Overfit] # Need to be the correct name ! The OverfitDataset class is retrieved from it.
     path: [/data/vidar/OverfitDataset]
     split: [overfit_dataset_mini.txt]
-    augmentation:
-        resize: [480,640]
+    # augmentation:
+    #     resize: [480,640]
     dataloader:
         batch_size: 1
         pin_memory: False
@@ -18,8 +18,8 @@ validation_mr:
     name: [Overfit]
     path: [/data/vidar/OverfitDataset]
     split: [overfit_val_dataset.txt]
-    augmentation:
-        resize: [480,640]
+    # augmentation:
+    #     resize: [480,640]
     dataloader:
         batch_size: 1
         pin_memory: False
