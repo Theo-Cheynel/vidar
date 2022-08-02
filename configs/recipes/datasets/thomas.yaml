@@ -1,7 +1,7 @@
 train_selfsup_mr:
     name: [Thomas] # Need to be the correct name ! The OverfitDataset class is retrieved from it.
     path: [/data/vidar/ThomasDataset]
-    split: [walk_no_one/640x360-10fps.txt]
+    split: [walk_person_idle/640x360-10fps.txt]
     # augmentation:
     #     resize: [480,640]
     dataloader:
@@ -12,12 +12,12 @@ train_selfsup_mr:
     labels: []
     cameras: [[0]]
     single_intrinsics: [True]
-    repeat: [5]
+    repeat: [10]
     depth_type: [velodyne]
 validation_mr:
     name: [Thomas]
     path: [/data/vidar/ThomasDataset]
-    split: [walk_no_one/640x360-10fps_val.txt]
+    split: [walk_person_idle/640x360-10fps_val.txt]
     # augmentation:
     #     resize: [480,640]
     dataloader:
