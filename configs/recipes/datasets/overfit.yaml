@@ -1,5 +1,5 @@
 train_selfsup_mr:
-    name: [Overfit] # Need to be the correct name ! The MinimalDataset class is retrieved from it.
+    name: [Overfit] # Need to be the correct name ! The OverfitDataset class is retrieved from it.
     path: [/data/vidar/OverfitDataset]
     split: [overfit_dataset_mini.txt]
     augmentation:
@@ -12,7 +12,7 @@ train_selfsup_mr:
     labels: []
     cameras: [[0]]
     single_intrinsics: [True]
-    repeat: [1]
+    repeat: [10]
     depth_type: [velodyne]
 validation_mr:
     name: [Overfit]
@@ -27,4 +27,5 @@ validation_mr:
     context: []
     labels: []
     cameras: [[0]]
-    single_intrinsics: [True]    
+    single_intrinsics: [True]
+    depth_type: [velodyne] 
