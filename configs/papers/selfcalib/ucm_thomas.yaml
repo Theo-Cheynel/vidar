@@ -1,0 +1,54 @@
+wrapper:
+    recipe: wrapper|default
+    validate_first: False
+arch:
+    model:
+        file: depth/SelfSupervisedModel
+        use_gt_intrinsics: False
+    networks:
+        depth:
+            recipe: networks/mono_depth_res_net|default
+            depth_range: [0.1,100.0]
+        pose:
+            recipe: networks/pose_net|default
+        intrinsics:
+            file: intrinsics/IntrinsicsNet
+            camera_model: 'UCM'
+            shape: [360, 640]
+    losses:
+        reprojection:
+            recipe: losses/reprojection|default
+        smoothness:
+            recipe: losses/smoothness|default
+evaluation:
+    depth:
+        recipe: evaluation/depth|kitti_resize
+optimizers:
+    depth:
+        recipe: optimizers|adam_20_05
+        lr: 0.0002
+    pose:
+        recipe: optimizers|adam_20_05
+        lr: 0.0002
+    intrinsics:
+        recipe: optimizers|adam_20_05
+        lr: 0.01
+datasets:
+    train:
+        recipe: datasets/thomas|train_selfsup_mr
+        dataloader:
+            batch_size: 1
+    validation:
+        recipe: datasets/thomas|validation_mr
+        dataloader:
+            batch_size: 1
+
+wandb:
+    folder: /data/vidar/wandb     # Where the wandb run is stored
+    entity: Kinetix           # Wandb entity
+    project: selfcalib         # Wandb project
+    num_validation_logs: 3
+checkpoint:
+    folder: /data/vidar/checkpoints       # Local folder to store checkpoints
+    save_code: False                       # Save repository folder as well
+    keep_top: 5                           # How many checkpoints should be stored
