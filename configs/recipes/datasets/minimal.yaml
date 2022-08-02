@@ -6,14 +6,15 @@ train_selfsup_mr:
         jittering: [0.2,0.2,0.2,0.05]
         resize: [192,640]
     dataloader:
-        batch_size: 1
+        batch_size: 8
         pin_memory: False
         num_workers: 4
     context: [-1,1]
     labels: []
     cameras: [[0]]
     single_intrinsics: [True]
-    repeat: [1]
+    repeat: [100]
+    depth_type: [velodyne]
 validation_mr:
     name: [Minimal]
     path: [/data/vidar/MinimalDataset]
@@ -22,7 +23,7 @@ validation_mr:
         jittering: [0.2,0.2,0.2,0.05]
         resize: [192,640]
     dataloader:
-        batch_size: 1
+        batch_size: 8
         pin_memory: False
         num_workers: 4
     context: []
