@@ -18,8 +18,8 @@ arch:
     losses:
         reprojection:
             recipe: losses/reprojection|default
-        # smoothness:
-        #     recipe: losses/smoothness|default
+        smoothness:
+            recipe: losses/smoothness|default
 evaluation:
     depth:
         recipe: evaluation/depth|kitti_resize
