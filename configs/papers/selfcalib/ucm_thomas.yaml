@@ -37,7 +37,7 @@ datasets:
     train:
         recipe: datasets/thomas|train_selfsup_mr
         dataloader:
-            batch_size: 10
+            batch_size: 8
     validation:
         recipe: datasets/thomas|validation_mr
         dataloader:
