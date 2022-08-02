@@ -10,7 +10,7 @@ from vidar.datasets.BaseDataset import BaseDataset
 from vidar.datasets.utils.misc import stack_sample, make_relative_pose
 from vidar.utils.read import read_image
 
-class OverfitDataset(BaseDataset):
+class ThomasDataset(BaseDataset):
     """
     Minimal dataset class
 
