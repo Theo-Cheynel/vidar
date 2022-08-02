@@ -58,8 +58,8 @@ class OverfitDataset(BaseDataset):
             data = f.readlines()
         self.paths = [os.path.join(self.path, fname.split()[0]) for fname in data]
 
-        # If using context, filter file list
-        # TODO : Figure out what this does
+        # Context are the context 'frames', that can be safely taken into account for the reprojection loss, given a frame.
+        # Each frame has its 'context frames', usually the ones preceding or following the frame.
         if self.with_context:
             paths_with_context = []
             for stride in [1]:
