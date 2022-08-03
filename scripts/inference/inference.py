@@ -275,6 +275,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False
                 if normalize:
                     save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index]) # Saving with normalization
                 else:
+                    breakpoint()
                     save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index])
         
 
