@@ -31,6 +31,7 @@ class MonoDepthResNet(BaseNet, ABC):
         """Network forward pass"""
 
         features = self.networks['mono_encoder'](rgb)
+        print("[MonoDepthResNet.forward]", [el.shape for el in features])
         output = self.networks['mono_depth'](features)
 
         sigmoids = [output[('output', i)] for i in range(self.num_scales)]
