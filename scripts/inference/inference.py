@@ -230,7 +230,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False
             files = [input_path]
 
 
-    batch_size = 2
+    batch_size = 1
 
     # # Process each remaining batch
     # with torch.profiler.profile(
