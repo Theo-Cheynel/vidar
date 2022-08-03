@@ -186,7 +186,7 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     return predictions
 
 
-def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False, verbose=False, **kwargs):
+def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False, normalize=True, verbose=False, **kwargs):
     """
     Runs an inference with the given config file or checkpoint.
 
@@ -230,57 +230,59 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False
             files = [input_path]
 
 
-    batch_size = 1
+    batch_size = 2
 
-    # Process each remaining batch
-    with torch.profiler.profile(
-        schedule=torch.profiler.schedule(wait=0, warmup=0, active=3, repeat=2),
-        on_trace_ready=torch.profiler.tensorboard_trace_handler('/data/log/profiler'),
-        record_shapes=True,
-        profile_memory=True,
-        with_stack=True
-    ) as prof:
+    # # Process each remaining batch
+    # with torch.profiler.profile(
+    #     schedule=torch.profiler.schedule(wait=0, warmup=0, active=3, repeat=2),
+    #     on_trace_ready=torch.profiler.tensorboard_trace_handler('/data/log/profiler'),
+    #     record_shapes=True,
+    #     profile_memory=True,
+    #     with_stack=True
+    # ) as prof:
 
-        if resize_check:
-            # Test the resize method with the first batch
-            image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
+    if resize_check:
+        # Test the resize method with the first batch
+        image_resize_mode, prediction = infer_batch_with_resize_test(files[0:batch_size], wrapper, verbose)
 
-            print("Tested first batch, image_resize_mode is", image_resize_mode)
-            for i, depth_map in enumerate(prediction['predictions']['depth'][0]):
-                depth_map /= depth_map.max()
-                save_image(depth_map, files[i])
+        print("Tested first batch, image_resize_mode is", image_resize_mode)
+        for i, depth_map in enumerate(prediction['predictions']['depth'][0]):
+            depth_map /= depth_map.max()
+            save_image(depth_map, files[i])
 
-            print('image_resize_mode =', image_resize_mode)
+        print('image_resize_mode =', image_resize_mode)
 
-        # Temporary
-        image_resize_mode = None
+    # Temporary
+    image_resize_mode = None
 
-        batch_filepaths = [files[i:i+batch_size] for i in range(
-            0 if not resize_check else batch_size, 
-            len(files), 
-            batch_size
-        )]
-        for filepaths in tqdm(batch_filepaths):
+    batch_filepaths = [files[i:i+batch_size] for i in range(
+        0 if not resize_check else batch_size, 
+        len(files), 
+        batch_size
+    )]
+    for filepaths in tqdm(batch_filepaths):
 
-            # Inference 
-            predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
-            print(predictions['predictions']['intrinsics'])
-            depth_maps = predictions['predictions']['depth'][0]
-            #print("#### Inference done")
-        
-            # Saving depth maps
-            output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
-            for i in np.arange(start=0, stop=len(depth_maps), step=4):
-                # TODO : Batchify the normalization
-                for in_batch_index in range(depth_maps[i].shape[0]): # Not using batch_size but the shape here for the last element that can have a dim < batch_size
+        # Inference 
+        predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
+        depth_maps = predictions['predictions']['depth'][0]
+        #print("#### Inference done")
+    
+        # Saving depth maps
+        output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
+        for i in np.arange(start=0, stop=len(depth_maps), step=4):
+            # TODO : Batchify the normalization
+            for in_batch_index in range(depth_maps[i].shape[0]): # Not using batch_size but the shape here for the last element that can have a dim < batch_size
+                if normalize:
                     save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index]) # Saving with normalization
-            
+                else:
+                    save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index])
+        
 
-            if verbose:
-                Log.info(f'Depth map inference done, saved depth map at {output_path}')
-            
-            prof.step()
-            #print("#### Batch done")
+        if verbose:
+            Log.info(f'Depth map inference done, saved depth map at {output_path}')
+        
+        prof.step()
+        #print("#### Batch done")
 
     # Deleting temp folder if needed
     if extracted_images_folder is not None:
