@@ -48,7 +48,7 @@ datasets:
 #     entity: Kinetix           # Wandb entity
 #     project: selfcalib         # Wandb project
 #     num_validation_logs: 3
-checkpoint:
-    folder: /data/vidar/checkpoints       # Local folder to store checkpoints
-    save_code: False                       # Save repository folder as well
-    keep_top: 5                           # How many checkpoints should be stored
+# checkpoint:
+#     folder: /data/vidar/checkpoints       # Local folder to store checkpoints
+#     save_code: False                       # Save repository folder as well
+#     keep_top: 5                           # How many checkpoints should be stored
