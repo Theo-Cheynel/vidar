@@ -1,2 +1,2 @@
 git pull
-python3 ./scripts/inference/inference.py ./configs/papers/selfcalib/ucm_kitti_inference.yaml /data/vidar/checkpoints/good-microwave-6/models/050.ckpt bru_it_got_folded.mp4 /data/output/
+python3 -m scripts.inference.inference ./configs/papers/selfcalib/ucm_overfit.yaml ~/Downloads/vidar/checkpoints/glowing-serenity-66/050.ckpt $1 ~/Downloads/vidar/output/
