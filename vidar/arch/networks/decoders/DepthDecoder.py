@@ -67,6 +67,7 @@ class DepthDecoder(nn.Module, ABC):
         outputs = {}
 
         x = input_features[-1]
+        print([el.shape for el in input_features])
         print(x.shape)
         for i in range(self.num_scales, -1, -1):
             x = self.convs[('upconv', i, 0)](x)
