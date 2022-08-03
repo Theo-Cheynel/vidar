@@ -104,7 +104,7 @@ class ResNetEncoder(nn.Module, ABC):
         x = self.encoder.conv1(x)
         x = self.encoder.bn1(x)
 
-        print('[ResNetEncoder x.shape]', x.shape)
+        print(self.encoder.layer1, self.encoder.layer2, self.encoder.layer3, self.encoder.layer4)
 
         self.features.clear()
         self.features.append(self.encoder.relu(x))
