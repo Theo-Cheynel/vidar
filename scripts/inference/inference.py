@@ -281,7 +281,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False
         if verbose:
             Log.info(f'Depth map inference done, saved depth map at {output_path}')
         
-        prof.step()
+        #prof.step()
         #print("#### Batch done")
 
     # Deleting temp folder if needed
