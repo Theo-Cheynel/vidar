@@ -70,6 +70,7 @@ class DepthDecoder(nn.Module, ABC):
         print(x.shape)
         for i in range(self.num_scales, -1, -1):
             x = self.convs[('upconv', i, 0)](x)
+            print(x.shape)
             x = [upsample(x)]
             if self.use_skips and i > 0:
                 
