@@ -43,11 +43,11 @@ datasets:
         dataloader:
             batch_size: 8
 
-wandb:
-    folder: /data/vidar/wandb     # Where the wandb run is stored
-    entity: Kinetix           # Wandb entity
-    project: selfcalib         # Wandb project
-    num_validation_logs: 3
+# wandb:
+#     folder: /data/vidar/wandb     # Where the wandb run is stored
+#     entity: Kinetix           # Wandb entity
+#     project: selfcalib         # Wandb project
+#     num_validation_logs: 3
 checkpoint:
     folder: /data/vidar/checkpoints       # Local folder to store checkpoints
     save_code: False                       # Save repository folder as well
