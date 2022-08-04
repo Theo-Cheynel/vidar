@@ -33,7 +33,6 @@ class ResNetMultiInput(models.ResNet, ABC):
         self.relu = nn.ReLU(inplace=True)
 
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        print('block_channels', block_channels)
         self.layer1 = self._make_layer(block_type,  64, block_channels[0])
         self.layer2 = self._make_layer(block_type, 128, block_channels[1], stride=2)
         self.layer3 = self._make_layer(block_type, 256, block_channels[2], stride=2)
