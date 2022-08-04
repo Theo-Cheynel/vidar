@@ -277,8 +277,6 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False
                 else:
                     save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index])
         
-        breakpoint()
-        
 
         if verbose:
             Log.info(f'Depth map inference done, saved depth map at {output_path}')
