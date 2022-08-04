@@ -67,11 +67,11 @@ class DepthDecoder(nn.Module, ABC):
         outputs = {}
 
         x = input_features[-1]
-        print([el.shape for el in input_features])
-        print(x.shape)
+        # print([el.shape for el in input_features])
+        # print(x.shape)
         for i in range(self.num_scales, -1, -1):
             x = self.convs[('upconv', i, 0)](x)
-            print(x.shape)
+            # print(x.shape)
             x = [upsample(x)]
             if self.use_skips and i > 0:
                 
@@ -79,8 +79,8 @@ class DepthDecoder(nn.Module, ABC):
                 
                 # Make sure we can concatenate the tensors by padding one to the other's size
                 if x[-1].shape != x[0].shape:
-                    print("Shape mismatch :", x[-1].shape, x[0].shape)
-                    #x[-1] = pad(x[-1], (0, x[0].shape[3] - x[-1].shape[3], 0, x[0].shape[2] - x[-1].shape[2], 0, 0, 0, 0))
+                    # print("Shape mismatch :", x[-1].shape, x[0].shape)
+                    x[-1] = pad(x[-1], (0, x[0].shape[3] - x[-1].shape[3], 0, x[0].shape[2] - x[-1].shape[2], 0, 0, 0, 0))
                 
             x = torch.cat(x, 1)
             x = self.convs[('upconv', i, 1)](x)
