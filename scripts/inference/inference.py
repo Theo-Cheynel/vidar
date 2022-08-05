@@ -289,7 +289,7 @@ def infer_depth_map(
                     else:
                         save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index], format='png')
                 elif export_type == 'npy':
-                    np.save(output_full_paths[in_batch_index] + '.npy', depth_maps[i][in_batch_index])
+                    np.save(output_full_paths[in_batch_index] + '.npy', depth_maps[i][in_batch_index].detach().cpu().numpy())
                 else:
                     raise TypeError(f'Unsupported export type {export_type}')
         
