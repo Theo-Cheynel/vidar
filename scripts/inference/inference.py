@@ -14,10 +14,10 @@ from scripts.inference.utils import video_utils
 from torchvision.io import read_image
 from torchvision.utils import save_image
 from tqdm import tqdm
+
 from vidar.core.wrapper import Wrapper
 from vidar.datasets.augmentations.resize import resize_pil, resize_sample_input
-from vidar.datasets.augmentations.tensor import (to_tensor, to_tensor_image,
-                                                 to_tensor_sample)
+from vidar.datasets.augmentations.tensor import to_tensor, to_tensor_image, to_tensor_sample
 from vidar.utils.config import read_config
 from vidar.utils.types import is_seq
 from vidar.utils.distributed import dist_mode
@@ -186,7 +186,16 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
     return predictions
 
 
-def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False, normalize=True, verbose=False, **kwargs):
+def infer_depth_map(
+    cfg, 
+    checkpoint, 
+    input_path, 
+    output_path,
+    export_type='png',
+    resize_check=False, 
+    normalize=True, 
+    verbose=False, 
+    **kwargs):
     """
     Runs an inference with the given config file or checkpoint.
 
@@ -195,6 +204,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False
         checkpoint : Network checkpoint to infer with
         input_path : either an image or a video path
         output_path : a folder to save the infered depth maps to
+        export_type : png|npy
         resize_check (bool): will try one batch without resizing, and resize afterwards if it failed.
         verbose : verbose
 
@@ -260,6 +270,7 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False
         len(files), 
         batch_size
     )]
+
     for filepaths in tqdm(batch_filepaths):
 
         # Inference 
@@ -272,10 +283,15 @@ def infer_depth_map(cfg, checkpoint, input_path, output_path, resize_check=False
         for i in np.arange(start=0, stop=len(depth_maps), step=4):
             # TODO : Batchify the normalization
             for in_batch_index in range(depth_maps[i].shape[0]): # Not using batch_size but the shape here for the last element that can have a dim < batch_size
-                if normalize:
-                    save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index]) # Saving with normalization
+                if export_type == 'png':
+                    if normalize:
+                        save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index]) # Saving with normalization
+                    else:
+                        save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index])
+                elif export_type == 'npy':
+                    np.save(output_full_paths[in_batch_index] + '.npy', depth_maps[i][in_batch_index])
                 else:
-                    save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index])
+                    raise TypeError(f'Unsupported export type {export_type}')
         
 
         if verbose:
