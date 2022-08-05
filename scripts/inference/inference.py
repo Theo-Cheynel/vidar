@@ -285,9 +285,9 @@ def infer_depth_map(
             for in_batch_index in range(depth_maps[i].shape[0]): # Not using batch_size but the shape here for the last element that can have a dim < batch_size
                 if export_type == 'png':
                     if normalize:
-                        save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index]) # Saving with normalization
+                        save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index], format='png') # Saving with normalization
                     else:
-                        save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index])
+                        save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index], format='png')
                 elif export_type == 'npy':
                     np.save(output_full_paths[in_batch_index] + '.npy', depth_maps[i][in_batch_index])
                 else:
