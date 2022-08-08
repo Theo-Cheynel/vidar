@@ -69,8 +69,10 @@ def break_context(dic, tgt=0, ctx=None, scl=None, stack=False):
     if scl is None:
         tgt, ctx = dic[tgt], [dic[key] for key in ctx if key != tgt]
     else:
-        print(tgt, scl, ctx)
-        tgt, ctx = dic[tgt][scl], [dic[key][scl] for key in ctx if key != tgt]
+        try:
+            tgt, ctx = dic[tgt][scl], [dic[key][scl] for key in ctx if key != tgt]
+        except KeyError:
+            return break_context(dic, tgt, None, scl, stack)
     # Stack context if requested
     if stack:
         ctx = torch.stack(ctx, 1)
