@@ -133,7 +133,10 @@ class DepthFormerModel(BaseModel, ABC):
         predictions = {}
 
         batch = {key: val for key, val in batch.items()}
+
+        from pdb import set_trace as breakpoint
         breakpoint()
+        
         batch['rgb'] = {key: val for key, val in batch['rgb'].items()}
 
         ### TRANSFORMER
