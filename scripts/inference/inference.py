@@ -191,7 +191,7 @@ def infer_depth_map(
     checkpoint, 
     input_path, 
     output_path,
-    export_type='png',
+    export_type=None,
     resize_check=False, 
     normalize=True, 
     verbose=False, 
@@ -204,7 +204,7 @@ def infer_depth_map(
         checkpoint : Network checkpoint to infer with
         input_path : either an image or a video path
         output_path : a folder to save the infered depth maps to
-        export_type : png|npy
+        export_type : None for no export, otherwise png or npy.
         resize_check (bool): will try one batch without resizing, and resize afterwards if it failed.
         verbose : verbose
 
@@ -275,27 +275,29 @@ def infer_depth_map(
 
         # Inference 
         predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
+        print(list(predictions.keys()))
+        return
         depth_maps = predictions['predictions']['depth'][0]
         #print("#### Inference done")
     
         # Saving depth maps
-        output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
-        for i in np.arange(start=0, stop=len(depth_maps), step=4):
-            # TODO : Batchify the normalization
-            for in_batch_index in range(depth_maps[i].shape[0]): # Not using batch_size but the shape here for the last element that can have a dim < batch_size
-                if export_type == 'png':
-                    if normalize:
-                        save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index], format='png') # Saving with normalization
+        if export_type is not None:
+            output_full_paths = [os.path.join(output_path, os.path.basename(f)) for f in filepaths]
+            for i in np.arange(start=0, stop=len(depth_maps), step=4):
+                # TODO : Batchify the normalization
+                for in_batch_index in range(depth_maps[i].shape[0]): # Not using batch_size but the shape here for the last element that can have a dim < batch_size
+                    if export_type == 'png':
+                        if normalize:
+                            save_image(depth_maps[i][in_batch_index] / depth_maps[i][in_batch_index].max(), output_full_paths[in_batch_index], format='png') # Saving with normalization
+                        else:
+                            save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index], format='png')
+                    elif export_type == 'npy':
+                        np.save(output_full_paths[in_batch_index] + '.npy', depth_maps[i][in_batch_index].detach().cpu().numpy())
                     else:
-                        save_image(depth_maps[i][in_batch_index], output_full_paths[in_batch_index], format='png')
-                elif export_type == 'npy':
-                    np.save(output_full_paths[in_batch_index] + '.npy', depth_maps[i][in_batch_index].detach().cpu().numpy())
-                else:
-                    raise TypeError(f'Unsupported export type {export_type}')
-        
-
-        if verbose:
-            Log.info(f'Depth map inference done, saved depth map at {output_path}')
+                        raise TypeError(f'Unsupported export type {export_type}')
+            
+            if verbose:
+                Log.info(f'Depth map inference done, saved depth map at {output_path}')
         
         #prof.step()
         #print("#### Batch done")
