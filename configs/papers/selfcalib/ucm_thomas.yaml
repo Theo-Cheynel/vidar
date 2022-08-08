@@ -6,6 +6,7 @@ arch:
         file: depth/SelfSupervisedModel
         use_gt_intrinsics: False
         #checkpoint: <checkpoint_path> to restart the training
+        checkpoint: /data/vidar/checkpoints/cool-bee-2/models/035.ckpt
     networks:
         depth:
             recipe: networks/mono_depth_res_net|default
