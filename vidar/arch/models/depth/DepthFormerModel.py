@@ -133,7 +133,7 @@ class DepthFormerModel(BaseModel, ABC):
         predictions = {}
 
         batch = {key: val for key, val in batch.items()}
-        print(batch['rgb'])
+        breakpoint()
         batch['rgb'] = {key: val for key, val in batch['rgb'].items()}
 
         ### TRANSFORMER
