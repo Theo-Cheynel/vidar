@@ -169,7 +169,7 @@ def infer_batch(images, wrapper, image_resize_mode, verbose=False):
         batch_tensor = to_tensor_image(images)
         # predictions = wrapper.run_arch({'rgb': torch.stack(batch_tensor).unsqueeze(0)}, 0, False, False)
         predictions = wrapper.run_arch({
-            'rgb': torch.stack(batch_tensor),
+            'rgb': {0: torch.stack(batch_tensor),},
             'intrinsics': {0: np.array([[1,      0.00, 0.5, 0],
                                 [0.00,   1,    0.5, 0],
                                 [0.00,   0.00, 1.0, 0],
