@@ -74,7 +74,7 @@ def break_context(dic, tgt=0, ctx=None, scl=None, stack=False):
         except KeyError:
             return break_context(dic, tgt, None, scl, stack)
     # Stack context if requested
-    if stack:
+    if stack and len(ctx) > 0:
         ctx = torch.stack(ctx, 1)
     # Return target and context
     return tgt, ctx
