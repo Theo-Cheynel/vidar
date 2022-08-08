@@ -61,6 +61,7 @@ def break_context(dic, tgt=0, ctx=None, scl=None, stack=False):
     ctx : list[torch.Tensor] or torch.Tensor
         Context information (list or stacked)
     """
+
     # Get remaining frames if context is not provided
     if ctx is None:
         ctx = [key for key in dic.keys() if key != tgt]
@@ -68,6 +69,7 @@ def break_context(dic, tgt=0, ctx=None, scl=None, stack=False):
     if scl is None:
         tgt, ctx = dic[tgt], [dic[key] for key in ctx if key != tgt]
     else:
+        print(tgt, scl, ctx)
         tgt, ctx = dic[tgt][scl], [dic[key][scl] for key in ctx if key != tgt]
     # Stack context if requested
     if stack:
