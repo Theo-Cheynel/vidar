@@ -199,7 +199,7 @@ def infer_depth_map(
     checkpoint, 
     input_path, 
     output_path,
-    export_type=None,
+    export_type='png',
     resize_check=False, 
     normalize=True, 
     verbose=False, 
@@ -248,7 +248,7 @@ def infer_depth_map(
             files = [input_path]
 
 
-    batch_size = 5
+    batch_size = 1
 
     # # Process each remaining batch
     # with torch.profiler.profile(
@@ -283,8 +283,6 @@ def infer_depth_map(
 
         # Inference 
         predictions = infer_batch(filepaths, wrapper, image_resize_mode, verbose)
-        print(list(predictions.keys()))
-        return
         depth_maps = predictions['predictions']['depth'][0]
         #print("#### Inference done")
     
